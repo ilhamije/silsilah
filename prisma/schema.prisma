@@ -1,0 +1,446 @@
+// Silsilah data model. See docs/PROPOSAL.md for the reasoning behind it.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum RelType {
+  PARENT_CHILD
+  SPOUSE
+}
+
+enum ImageStatus {
+  UPLOADED
+  EXTRACTING
+  EXTRACTED
+  REJECTED
+  BORDERLINE
+  FAILED
+  CONFIRMED
+}
+
+enum DraftStatus {
+  OPEN
+  CONFIRMED
+  DISCARDED
+}
+
+enum SuggestionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  REVIEWING
+  SUPERSEDED
+}
+
+enum ScoreBand {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  REVOKED
+}
+
+enum EditStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ─── Auth.js ──────────────────────────────────────────────────────────────
+
+model User {
+  id                          String    @id @default(cuid())
+  name                        String?
+  email                       String    @unique
+  emailVerified               DateTime?
+  image                       String?
+  isAdmin                     Boolean   @default(false)
+  locale                      String?
+  deleteOriginalsAfterConfirm Boolean   @default(false)
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  memberships        TreeMember[]
+  invitationsCreated Invitation[]    @relation("InvitationCreatedBy")
+  activity           ActivityLog[]
+  suggestedEdits     SuggestedEdit[] @relation("SuggestedEditSubmitter")
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ─── Trees and membership ────────────────────────────────────────────────
+
+// Ownership lives only in TreeMember so a tree can have several owners.
+model FamilyTree {
+  id                    String   @id @default(cuid())
+  name                  String
+  hideLivingFromViewers Boolean  @default(true)
+  allowCrossFamilyMatch Boolean  @default(false)
+  // Bumped on every person/relationship change; merge detection uses it to
+  // tell whether a tree changed since a suggestion was rejected.
+  structureVersion      Int      @default(0)
+  lastEditedById        String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  members        TreeMember[]
+  invitations    Invitation[]
+  people         Person[]
+  relationships  Relationship[]
+  images         SourceImage[]
+  drafts         ImportDraft[]
+  suggestedEdits SuggestedEdit[]
+  activity       ActivityLog[]
+  suggestionsA   MergeSuggestion[]   @relation("SuggestionTreeA")
+  suggestionsB   MergeSuggestion[]   @relation("SuggestionTreeB")
+  requestsFrom   ConnectionRequest[] @relation("RequestFromTree")
+  requestsTo     ConnectionRequest[] @relation("RequestToTree")
+  linksA         PersonLink[]        @relation("LinkTreeA")
+  linksB         PersonLink[]        @relation("LinkTreeB")
+}
+
+model TreeMember {
+  treeId   String
+  userId   String
+  role     Role
+  joinedAt DateTime @default(now())
+
+  tree FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([treeId, userId])
+  @@index([userId])
+}
+
+model Invitation {
+  id          String    @id @default(cuid())
+  treeId      String
+  email       String? // null = shareable link
+  tokenHash   String    @unique // sha-256 of the token; the raw token only lives in the link
+  role        Role
+  singleUse   Boolean   @default(true)
+  useCount    Int       @default(0)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdById String
+  createdAt   DateTime  @default(now())
+
+  tree      FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  createdBy User       @relation("InvitationCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([treeId])
+}
+
+// ─── People and relationships ────────────────────────────────────────────
+
+model Person {
+  id             String    @id @default(cuid())
+  treeId         String
+  fullName       String
+  givenName      String?
+  familyName     String?
+  nicknames      String[]
+  gender         Gender    @default(UNKNOWN)
+  birthDate      String? // verbatim, may be partial: "1952", "~1950", "Mei 1931"
+  birthYear      Int? // parsed from birthDate, for matching and living inference
+  deathDate      String?
+  deathYear      Int?
+  birthPlace     String?
+  notes          String?
+  // null = unknown; treated as living for privacy.
+  isLiving       Boolean?
+  livingIsManual Boolean   @default(false)
+  sourceImageId  String?
+  sourceBox      Json? // {page, x, y, w, h}, normalized 0..1, approximate
+  nameKey        String    @default("") // normalized name key for cross-tree lookup
+  version        Int       @default(1)
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  updatedById    String?
+
+  tree           FamilyTree      @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  sourceImage    SourceImage?    @relation(fields: [sourceImageId], references: [id], onDelete: SetNull)
+  relsAsA        Relationship[]  @relation("RelPersonA")
+  relsAsB        Relationship[]  @relation("RelPersonB")
+  suggestedEdits SuggestedEdit[]
+  linksAsA       PersonLink[]    @relation("LinkPersonA")
+  linksAsB       PersonLink[]    @relation("LinkPersonB")
+
+  @@index([treeId, deletedAt])
+  @@index([nameKey])
+}
+
+// PARENT_CHILD: personA = parent, personB = child.
+// SPOUSE: personA/personB in canonical order (personAId < personBId).
+model Relationship {
+  id        String    @id @default(cuid())
+  treeId    String
+  type      RelType
+  personAId String
+  personBId String
+  version   Int       @default(1)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  tree    FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  personA Person     @relation("RelPersonA", fields: [personAId], references: [id], onDelete: Cascade)
+  personB Person     @relation("RelPersonB", fields: [personBId], references: [id], onDelete: Cascade)
+
+  @@unique([treeId, type, personAId, personBId])
+  @@index([personBId])
+}
+
+// ─── Images and extraction ───────────────────────────────────────────────
+
+model SourceImage {
+  id           String      @id @default(cuid())
+  treeId       String
+  draftId      String?
+  pageIndex    Int         @default(0)
+  // Private Vercel Blob pathname. Never sent to the client; null once the
+  // original has been deleted (the extraction JSON is kept).
+  blobPathname String?
+  status       ImageStatus @default(UPLOADED)
+  extraction   Json?
+  model        String?
+  uploadedById String?
+  uploadedAt   DateTime    @default(now())
+
+  tree   FamilyTree   @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  draft  ImportDraft? @relation(fields: [draftId], references: [id], onDelete: SetNull)
+  people Person[]
+
+  @@index([treeId])
+}
+
+// Review-screen state. Person rows are only created when a draft is confirmed.
+model ImportDraft {
+  id          String      @id @default(cuid())
+  treeId      String
+  status      DraftStatus @default(OPEN)
+  combined    Json? // merged multi-page extraction
+  edited      Json? // the user's edits on the review screen (autosaved)
+  createdById String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  tree   FamilyTree    @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  images SourceImage[]
+}
+
+// Rejected or borderline uploads, for prompt tuning. Never holds image data.
+model RejectionLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  kind       String // "rejected" | "borderline" | "user_continued"
+  reason     String?
+  confidence Float
+  language   String?
+  createdAt  DateTime @default(now())
+}
+
+// ─── Merge suggestions (link-based) ──────────────────────────────────────
+
+// treeAId < treeBId so each unordered pair of trees has one row per detection.
+model MergeSuggestion {
+  id             String           @id @default(cuid())
+  treeAId        String
+  treeBId        String
+  matchedPairs   Json // [{aId, bId, similarity, confirmedBy: [...]}]
+  evidence       Json // plain-language sentences, per viewer side
+  score          Float
+  band           ScoreBand
+  status         SuggestionStatus @default(PENDING)
+  crossFamily    Boolean          @default(false)
+  fingerprint    String // hash of the confirmed pair set
+  treeAVersion   Int
+  treeBVersion   Int
+  configSnapshot Json
+  createdAt      DateTime         @default(now())
+  decidedAt      DateTime?
+  decidedById    String?
+
+  treeA      FamilyTree          @relation("SuggestionTreeA", fields: [treeAId], references: [id], onDelete: Cascade)
+  treeB      FamilyTree          @relation("SuggestionTreeB", fields: [treeBId], references: [id], onDelete: Cascade)
+  outcomes   MergeOutcome[]
+  operations MergeOperation[]
+  requests   ConnectionRequest[]
+  links      PersonLink[]
+
+  @@index([treeAId, treeBId, status])
+}
+
+// One row per decision, for the admin tuning page.
+model MergeOutcome {
+  id           String    @id @default(cuid())
+  suggestionId String
+  outcome      String // accepted | rejected | reviewed | undone
+  score        Float
+  band         ScoreBand
+  similarities Json
+  matchKinds   String[]
+  createdAt    DateTime  @default(now())
+
+  suggestion MergeSuggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+}
+
+// Accepting a merge keeps both trees and links the matched people.
+model PersonLink {
+  id           String    @id @default(cuid())
+  treeAId      String
+  treeBId      String
+  personAId    String
+  personBId    String
+  suggestionId String?
+  operationId  String?
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  removedAt    DateTime? // set on undo or manual unlink
+
+  treeA      FamilyTree       @relation("LinkTreeA", fields: [treeAId], references: [id], onDelete: Cascade)
+  treeB      FamilyTree       @relation("LinkTreeB", fields: [treeBId], references: [id], onDelete: Cascade)
+  personA    Person           @relation("LinkPersonA", fields: [personAId], references: [id], onDelete: Cascade)
+  personB    Person           @relation("LinkPersonB", fields: [personBId], references: [id], onDelete: Cascade)
+  suggestion MergeSuggestion? @relation(fields: [suggestionId], references: [id], onDelete: SetNull)
+  operation  MergeOperation?  @relation(fields: [operationId], references: [id], onDelete: SetNull)
+
+  @@unique([personAId, personBId])
+  @@index([personBId])
+}
+
+// History of accepted merges. `before` snapshots every person row whose
+// fields were changed while resolving conflicts, so undo restores them exactly.
+model MergeOperation {
+  id            String    @id @default(cuid())
+  suggestionId  String?
+  performedById String
+  fieldChoices  Json
+  before        Json
+  createdAt     DateTime  @default(now())
+  undoneAt      DateTime?
+  undoneById    String?
+
+  suggestion MergeSuggestion? @relation(fields: [suggestionId], references: [id], onDelete: SetNull)
+  links      PersonLink[]
+}
+
+model ConnectionRequest {
+  id                String        @id @default(cuid())
+  fromTreeId        String
+  toTreeId          String
+  mergeSuggestionId String
+  requestedById     String
+  status            RequestStatus @default(PENDING)
+  respondedById     String?
+  createdAt         DateTime      @default(now())
+  respondedAt       DateTime?
+
+  fromTree   FamilyTree      @relation("RequestFromTree", fields: [fromTreeId], references: [id], onDelete: Cascade)
+  toTree     FamilyTree      @relation("RequestToTree", fields: [toTreeId], references: [id], onDelete: Cascade)
+  suggestion MergeSuggestion @relation(fields: [mergeSuggestionId], references: [id], onDelete: Cascade)
+
+  @@index([toTreeId, status])
+}
+
+// ─── Collaboration ───────────────────────────────────────────────────────
+
+model SuggestedEdit {
+  id              String     @id @default(cuid())
+  treeId          String
+  personId        String
+  baseVersion     Int
+  proposedChanges Json
+  submittedById   String
+  status          EditStatus @default(PENDING)
+  reviewedById    String?
+  createdAt       DateTime   @default(now())
+  reviewedAt      DateTime?
+
+  tree        FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  person      Person     @relation(fields: [personId], references: [id], onDelete: Cascade)
+  submittedBy User       @relation("SuggestedEditSubmitter", fields: [submittedById], references: [id], onDelete: Cascade)
+
+  @@index([treeId, status])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  treeId     String
+  userId     String?
+  action     String // created | updated | deleted | restored | purged | merged | unmerged | uploaded | invited | joined | left | role_changed | …
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+
+  tree FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  user User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([treeId, createdAt])
+}
