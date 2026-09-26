@@ -123,7 +123,7 @@ it is the source of truth. In short:
 
 | Area | Models |
 |---|---|
-| Auth.js | `User` (+ `isAdmin`, `locale`, `deleteOriginalsAfterConfirm`), `Account`, `Session`, `VerificationToken` |
+| Auth.js | `User` (+ `locale`, `deleteOriginalsAfterConfirm`; super admins come from the `ADMIN_EMAILS` env var, not the DB), `Account`, `Session`, `VerificationToken` |
 | Trees & sharing | `FamilyTree` (privacy + cross-family settings, `structureVersion`), `TreeMember` (role), `Invitation` (hashed token, single/multi-use, expiry, revoke) |
 | Family data | `Person` (verbatim partial dates + parsed years, `isLiving`/`livingIsManual`, `nameKey`, `version`, `deletedAt`), `Relationship` (`PARENT_CHILD` / `SPOUSE`, `version`, `deletedAt`) |
 | Extraction | `SourceImage` (private blob pathname, extraction JSON), `ImportDraft` (review state), `RejectionLog` (no image data) |

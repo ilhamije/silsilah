@@ -8,7 +8,8 @@
     "signOut": "Keluar",
     "signIn": "Masuk",
     "language": "Bahasa",
-    "skipToContent": "Langsung ke konten"
+    "skipToContent": "Langsung ke konten",
+    "admin": "Admin"
   },
   "home": {
     "cta": "Mulai",
@@ -69,5 +70,17 @@
   "errors": {
     "generic": "Terjadi kesalahan. Silakan coba lagi.",
     "notFound": "Halaman tidak ditemukan, atau Anda tidak punya akses."
+  },
+  "admin": {
+    "title": "Admin",
+    "privacyNote": "Hanya angka keseluruhan aplikasi. Status admin tidak memberi akses ke silsilah keluarga siapa pun.",
+    "users": "Pengguna",
+    "trees": "Silsilah",
+    "people": "Orang",
+    "images": "Gambar diunggah",
+    "rejections30d": "Unggahan ditolak (30 hari)",
+    "admins": "Admin",
+    "howToChange": "Admin diatur lewat variabel lingkungan ADMIN_EMAILS. Ubah di Vercel lalu deploy ulang.",
+    "comingSoon": "Statistik penyesuaian saran penggabungan hadir di tahap 5."
   }
 }

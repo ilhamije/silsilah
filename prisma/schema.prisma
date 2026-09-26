@@ -79,7 +79,6 @@ model User {
   email                       String    @unique
   emailVerified               DateTime?
   image                       String?
-  isAdmin                     Boolean   @default(false)
   locale                      String?
   deleteOriginalsAfterConfirm Boolean   @default(false)
   createdAt                   DateTime  @default(now())

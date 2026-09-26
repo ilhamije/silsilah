@@ -8,7 +8,8 @@
     "signOut": "Sign out",
     "signIn": "Sign in",
     "language": "Language",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "admin": "Admin"
   },
   "home": {
     "cta": "Get started",
@@ -69,5 +70,17 @@
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "notFound": "We couldn't find that page, or you don't have access to it."
+  },
+  "admin": {
+    "title": "Admin",
+    "privacyNote": "App-wide numbers only. Being an admin doesn't give you access to anyone's family tree.",
+    "users": "Users",
+    "trees": "Trees",
+    "people": "People",
+    "images": "Uploaded images",
+    "rejections30d": "Rejected uploads (30 days)",
+    "admins": "Admins",
+    "howToChange": "Admins are set in the ADMIN_EMAILS environment variable. Change it in Vercel and redeploy.",
+    "comingSoon": "Merge-suggestion tuning statistics arrive with phase 5."
   }
 }

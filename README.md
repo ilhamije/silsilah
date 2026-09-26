@@ -52,6 +52,29 @@ Another option is a free Neon branch; put its URLs in `.env`.
 **Signing in locally:** leave `RESEND_API_KEY` empty. The magic link is then
 printed in the terminal running `npm run dev`. Open that link in the browser.
 
+## Super admins
+
+Admins are set with the `ADMIN_EMAILS` environment variable, a comma-separated
+list:
+
+```bash
+ADMIN_EMAILS="first.admin@example.com,second.admin@example.com"
+```
+
+- Locally, put it in `.env` and restart the server.
+- On Vercel, go to **Project → Settings → Environment Variables**, add
+  `ADMIN_EMAILS` for Production (and Preview if you want), then **redeploy**.
+  Changes to environment variables only take effect after a redeploy.
+- Each admin signs in normally with a magic link to that exact address (case
+  doesn't matter). An **Admin** link then appears in the header, leading to
+  `/admin`.
+- To remove an admin, take the address out of the list and redeploy.
+
+There is no admin flag in the database, so admin rights can't be granted from
+inside the app. The admin area shows app-wide statistics and, from phase 5,
+merge-tuning data. **It does not give access to anyone's family trees.** Tree
+access always requires membership. Non-admins who open `/admin` get a 404.
+
 ## Scripts
 
 | Command | What it does |
@@ -82,6 +105,7 @@ truncates its tables. Never point `DATABASE_URL_TEST` at data you care about.
      verified in Resend)
    - `ANTHROPIC_API_KEY`
    - `CRON_SECRET`
+   - `ADMIN_EMAILS`: the two admin email addresses, comma-separated
 5. Set the **Build Command** to `npm run db:deploy && npm run build`, so
    migrations run on each deploy using the unpooled URL.
 6. Deploy. `vercel.json` sets up one daily cron (`/api/cron/daily`). It
