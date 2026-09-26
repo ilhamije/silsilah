@@ -1,0 +1,73 @@
+{
+  "app": {
+    "name": "Silsilah",
+    "tagline": "Ubah silsilah tulisan tangan menjadi arsip keluarga yang bisa dibagikan."
+  },
+  "nav": {
+    "myTrees": "Silsilah saya",
+    "signOut": "Keluar",
+    "signIn": "Masuk",
+    "language": "Bahasa",
+    "skipToContent": "Langsung ke konten"
+  },
+  "home": {
+    "cta": "Mulai",
+    "step1": "Foto silsilah keluarga tulisan tangan",
+    "step2": "Periksa hasil bacaan kami dan perbaiki kesalahannya",
+    "step3": "Bagikan dengan kerabat Anda",
+    "privacy": "Silsilah Anda bersifat pribadi kecuali Anda mengundang seseorang."
+  },
+  "login": {
+    "title": "Masuk",
+    "intro": "Masukkan email Anda dan kami akan mengirim tautan untuk masuk. Tidak perlu kata sandi.",
+    "email": "Alamat email",
+    "submit": "Kirim tautan masuk",
+    "checkTitle": "Periksa email Anda",
+    "checkBody": "Kami telah mengirim tautan masuk ke kotak masuk Anda. Tautan hanya bisa dipakai sekali dan berlaku satu jam.",
+    "checkSpam": "Tidak menemukannya? Periksa folder spam, atau kembali dan coba lagi.",
+    "back": "Kembali",
+    "error": "Terjadi kesalahan saat masuk. Silakan coba lagi.",
+    "inviteHint": "Masuk untuk bergabung dengan silsilah yang mengundang Anda."
+  },
+  "trees": {
+    "title": "Silsilah saya",
+    "empty": "Anda belum punya silsilah keluarga.",
+    "create": "Silsilah baru",
+    "nameLabel": "Nama silsilah",
+    "namePlaceholder": "mis. Keluarga Hasan",
+    "createSubmit": "Buat silsilah",
+    "cancel": "Batal",
+    "people": "{count, plural, =0 {Belum ada orang} other {# orang}}",
+    "members": "{count, plural, =1 {Hanya Anda} other {# anggota}}",
+    "updated": "Diperbarui {date}"
+  },
+  "roles": {
+    "OWNER": "Pemilik",
+    "EDITOR": "Penyunting",
+    "VIEWER": "Pembaca"
+  },
+  "tree": {
+    "people": "Anggota keluarga",
+    "noPeople": "Belum ada orang di silsilah ini.",
+    "comingSoon": "Unggah foto, layar pemeriksaan, dan bagan silsilah hadir di tahap berikutnya.",
+    "living": "Masih hidup",
+    "deceased": "Almarhum/ah",
+    "hidden": "Detail disembunyikan",
+    "updatedBy": "Diperbarui oleh {name} {when}"
+  },
+  "invite": {
+    "title": "Anda diundang",
+    "body": "Anda diundang bergabung dengan “{tree}” sebagai {role}.",
+    "accept": "Gabung",
+    "signInFirst": "Masuk untuk bergabung",
+    "expired": "Undangan ini sudah kedaluwarsa. Minta undangan baru kepada pengirimnya.",
+    "revoked": "Undangan ini telah dibatalkan.",
+    "used": "Undangan ini sudah digunakan.",
+    "not_found": "Tautan undangan ini tidak valid.",
+    "email_mismatch": "Undangan ini dikirim ke alamat email lain. Masuk dengan alamat tersebut untuk menerimanya."
+  },
+  "errors": {
+    "generic": "Terjadi kesalahan. Silakan coba lagi.",
+    "notFound": "Halaman tidak ditemukan, atau Anda tidak punya akses."
+  }
+}

@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fbfaf7;
+  --surface: #ffffff;
+  --foreground: #1c1917;
+  --muted: #57534e;
+  --border: #e7e5e4;
+  --brand: #166534;
+  --brand-fg: #ffffff;
+  --brand-soft: #dcfce7;
+  --warn: #92400e;
+  --warn-soft: #fef3c7;
+  --danger: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #12110f;
+    --surface: #1c1a17;
+    --foreground: #f5f5f4;
+    --muted: #a8a29e;
+    --border: #3a3632;
+    --brand: #4ade80;
+    --brand-fg: #052e16;
+    --brand-soft: #14532d;
+    --warn: #fcd34d;
+    --warn-soft: #451a03;
+    --danger: #f87171;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  /* System fonts: nothing extra to download on a slow connection. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}

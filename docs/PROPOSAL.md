@@ -1,6 +1,6 @@
 # Silsilah — Phase 0 proposal
 
-Status: **draft, awaiting confirmation**. Nothing below is built yet.
+Status: **confirmed** (decisions recorded in section 7). Phase 1 is built.
 
 This covers the three things asked for before any code: folder structure, data
 model, and the extraction prompt. It also lists the stack decisions, including
@@ -13,14 +13,15 @@ questions I need answered before starting phase 1.
 
 | Area | Choice | Notes |
 |---|---|---|
-| Framework | Next.js 15 (App Router) + TypeScript, Tailwind v4 | As specified |
+| Framework | Next.js 16 (App Router) + TypeScript, Tailwind v4 | As specified |
+| i18n | `next-intl`, English (default) + Bahasa Indonesia, cookie-based, toggle in the header on every page | No locale in URLs |
 | Hosting | Vercel Hobby | Fluid compute, so AI routes get `maxDuration = 300` (the Hobby maximum; I'll re-check it when the route is built) |
 | DB | Neon Postgres via Vercel Marketplace, Prisma | `DATABASE_URL` (pooled) at runtime, `DATABASE_URL_UNPOOLED` as `directUrl` for migrations |
 | **Local DB** | **Postgres too (Docker or a Neon dev branch), not SQLite** | **Deviation.** The schema uses Postgres enums, `String[]` and `Jsonb`. SQLite would need a second schema that drifts from production. Merge logic is pure TS, so its unit tests need no DB at all. |
 | Images | **Vercel Blob in private mode** | Private Blob has been GA since June 2026. Blobs are stored with `access: 'private'`, and pages never see the pathnames. Images are served by `GET /api/images/[id]`, which checks tree membership and then streams the blob (or 302s to a short-lived signed URL). |
 | Upload path | Browser → our route → Blob | Compressed images are about 0.3–1 MB, under the 4.5 MB function body limit, so this is simpler than client-direct upload and the role check happens in the same place. |
 | Auth | Auth.js v5, Prisma adapter, **magic link via Resend** | No passwords to store or reset. Resend also sends the invites. Credentials login can come later if you want it. |
-| AI | Anthropic SDK, server only, model from `ANTHROPIC_MODEL` env | Tool-use/structured output forces the JSON shape, Zod still validates it, and one retry on failure. See Q3 for which model. |
+| AI | Anthropic SDK, server only, `ANTHROPIC_MODEL` env, **default `claude-sonnet-5`** | Tool-use/structured output forces the JSON shape, Zod still validates it, and one retry on failure. |
 | Tree view | **`family-chart`** (d3-based) | `react-d3-tree` only draws strict hierarchies, so it can't show two parents plus spouses. `family-chart` handles spouses and multiple parents, and d3-zoom gives pinch/pan. If it fights us on touch, I'll fall back to a custom SVG with `d3-zoom`. |
 | HEIC | `heic2any`, lazy-loaded only when a HEIC file is picked | Keeps the main bundle small |
 | Background work | `after()` from `next/server` for merge detection after save; one daily Vercel Cron (Hobby allows daily) for 30-day purges and expired invites | No queue service needed |
@@ -117,212 +118,17 @@ Ownership lives only in `TreeMember`. `FamilyTree` has no `ownerId`, which is
 what makes multiple owners possible. The app refuses to remove or demote the
 last owner.
 
-```prisma
-enum Role            { OWNER EDITOR VIEWER }
-enum Gender          { MALE FEMALE UNKNOWN }
-enum RelType         { PARENT_CHILD SPOUSE }
-enum ImageStatus     { UPLOADED EXTRACTING EXTRACTED REJECTED BORDERLINE FAILED CONFIRMED }
-enum DraftStatus     { OPEN CONFIRMED DISCARDED }
-enum SuggestionStatus{ PENDING ACCEPTED REJECTED REVIEWING SUPERSEDED }
-enum ScoreBand       { HIGH MEDIUM LOW }
-enum ReqStatus       { PENDING ACCEPTED DECLINED REVOKED }
+The full, commented schema is in [`prisma/schema.prisma`](../prisma/schema.prisma);
+it is the source of truth. In short:
 
-// Auth.js tables (Account, Session, VerificationToken) omitted.
-model User {
-  id                        String   @id @default(cuid())
-  email                     String   @unique
-  name                      String?
-  isAdmin                   Boolean  @default(false)   // or ADMIN_EMAILS env
-  deleteOriginalsAfterConfirm Boolean @default(false)
-  memberships               TreeMember[]
-}
-
-model FamilyTree {
-  id                    String   @id @default(cuid())
-  name                  String
-  hideLivingFromViewers Boolean  @default(true)
-  allowCrossFamilyMatch Boolean  @default(false)
-  archivedAt            DateTime?          // set on the source tree after a merge
-  structureVersion      Int      @default(0) // bumped on any person/relationship change
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  lastEditedById        String?
-}
-
-model TreeMember {
-  treeId   String
-  userId   String
-  role     Role
-  joinedAt DateTime @default(now())
-  @@id([treeId, userId])
-}
-
-model Invitation {
-  id         String   @id @default(cuid())
-  treeId     String
-  email      String?             // null = shareable link
-  tokenHash  String   @unique    // only the hash is stored, the raw token goes in the link
-  role       Role                // OWNER not allowed via link
-  singleUse  Boolean  @default(true)
-  useCount   Int      @default(0)
-  expiresAt  DateTime            // default now + 7d
-  revokedAt  DateTime?
-  createdById String
-}
-
-model Person {
-  id            String   @id @default(cuid())
-  treeId        String
-  fullName      String
-  givenName     String?
-  familyName    String?
-  nicknames     String[]
-  gender        Gender   @default(UNKNOWN)
-  birthDate     String?            // verbatim partial date: "1952", "~1950", "12 Mei 1931"
-  birthYear     Int?               // parsed, for matching/living inference
-  deathDate     String?
-  deathYear     Int?
-  birthPlace    String?
-  notes         String?
-  isLiving      Boolean?           // null = unknown
-  livingIsManual Boolean @default(false)
-  sourceImageId String?
-  sourceBox     Json?              // {page, x, y, w, h} normalized 0..1, approximate
-  nameKey       String             // normalized key, indexed, for cross-tree candidate lookup
-  version       Int      @default(1)
-  deletedAt     DateTime?
-  mergedIntoId  String?            // set when absorbed by a merge (undo clears it)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  updatedById   String?
-  @@index([treeId, deletedAt])
-  @@index([nameKey])
-}
-
-model Relationship {
-  id        String  @id @default(cuid())
-  treeId    String
-  type      RelType
-  personAId String            // parent (PARENT_CHILD); lower id (SPOUSE, canonical order)
-  personBId String            // child
-  version   Int     @default(1)
-  deletedAt DateTime?
-  @@unique([treeId, type, personAId, personBId])
-}
-
-model SourceImage {
-  id            String      @id @default(cuid())
-  treeId        String
-  draftId       String?
-  pageIndex     Int
-  blobPathname  String?       // null once the original is deleted
-  status        ImageStatus
-  extraction    Json?         // validated model output, kept after image deletion
-  model         String?
-  uploadedById  String
-  uploadedAt    DateTime    @default(now())
-}
-
-// Holds the combined, user-edited extraction until "Confirm". Person rows are
-// created only in the confirm transaction.
-model ImportDraft {
-  id        String      @id @default(cuid())
-  treeId    String
-  status    DraftStatus @default(OPEN)
-  combined  Json        // merged multi-page extraction
-  edited    Json        // current state of the review screen (autosaved)
-  createdById String
-}
-
-model RejectionLog {           // no image, no image URL
-  id        String   @id @default(cuid())
-  userId    String?
-  reason    String?
-  confidence Float
-  language  String?
-  kind      String   // "rejected" | "borderline" | "user_continued"
-  createdAt DateTime @default(now())
-}
-
-model MergeSuggestion {
-  id              String   @id @default(cuid())
-  treeAId         String
-  treeBId         String
-  matchedPairs    Json     // [{aId,bId,similarity,confirmedBy:[{anchorA,anchorB,kind,depth}]}]
-  evidence        Json     // plain-language sentences
-  score           Float
-  band            ScoreBand
-  status          SuggestionStatus @default(PENDING)
-  crossFamily     Boolean  @default(false)
-  fingerprint     String   // hash of the confirmed pair set; used to suppress re-suggesting
-  treeAVersion    Int      // structureVersion at detection time
-  treeBVersion    Int
-  configSnapshot  Json
-  createdAt       DateTime @default(now())
-  decidedAt       DateTime?
-  decidedById     String?
-  @@index([treeAId, treeBId, status])
-}
-
-model MergeOutcome {           // analytics for tuning, one row per decision
-  id            String   @id @default(cuid())
-  suggestionId  String
-  outcome       String   // accepted | rejected | reviewed | undone
-  score         Float
-  band          ScoreBand
-  similarities  Json     // per pair
-  matchKinds    String[] // e.g. ["sibling","grandparent"]
-  createdAt     DateTime @default(now())
-}
-
-model MergeOperation {         // history + undo
-  id            String   @id @default(cuid())
-  suggestionId  String?
-  targetTreeId  String
-  sourceTreeId  String
-  performedById String
-  fieldChoices  Json      // per merged pair: which value was kept for each conflicting field
-  before        Json      // snapshot of every row touched, enough to restore exactly
-  createdAt     DateTime  @default(now())
-  undoneAt      DateTime?
-}
-
-model ConnectionRequest {
-  id                String    @id @default(cuid())
-  fromTreeId        String
-  toTreeId          String
-  mergeSuggestionId String
-  requestedById     String
-  status            ReqStatus @default(PENDING)
-  respondedById     String?
-  createdAt         DateTime  @default(now())
-}
-
-model SuggestedEdit {
-  id              String   @id @default(cuid())
-  treeId          String
-  personId        String
-  baseVersion     Int      // person.version when the viewer proposed it
-  proposedChanges Json
-  submittedById   String
-  status          String   @default("pending") // pending | approved | rejected
-  reviewedById    String?
-  createdAt       DateTime @default(now())
-}
-
-model ActivityLog {
-  id         String   @id @default(cuid())
-  treeId     String
-  userId     String?
-  action     String   // created | updated | deleted | restored | merged | unmerged | uploaded | invited | role_changed …
-  entityType String
-  entityId   String?
-  before     Json?
-  after      Json?
-  createdAt  DateTime @default(now())
-  @@index([treeId, createdAt])
-}
-```
+| Area | Models |
+|---|---|
+| Auth.js | `User` (+ `isAdmin`, `locale`, `deleteOriginalsAfterConfirm`), `Account`, `Session`, `VerificationToken` |
+| Trees & sharing | `FamilyTree` (privacy + cross-family settings, `structureVersion`), `TreeMember` (role), `Invitation` (hashed token, single/multi-use, expiry, revoke) |
+| Family data | `Person` (verbatim partial dates + parsed years, `isLiving`/`livingIsManual`, `nameKey`, `version`, `deletedAt`), `Relationship` (`PARENT_CHILD` / `SPOUSE`, `version`, `deletedAt`) |
+| Extraction | `SourceImage` (private blob pathname, extraction JSON), `ImportDraft` (review state), `RejectionLog` (no image data) |
+| Merging | `MergeSuggestion`, `MergeOutcome` (tuning analytics), `PersonLink` (accepted matches), `MergeOperation` (history + undo), `ConnectionRequest` |
+| Collaboration | `SuggestedEdit`, `ActivityLog` |
 
 Key mechanics:
 
@@ -513,6 +319,15 @@ is another pair (a₂,b₂) ∈ M with a₁≠a₂ and b₁≠b₂, and one of t
   Distances go up to 3 (great-grandparent).
 - **Common descendant:** the mirror case, with (x,y) a descendant of both,
   and distances up to 2 (grandchild).
+- **Direct line** (added after review, so the rule is less strict): a₁ is a
+  parent or grandparent of a₂ in A, and b₁ is the same relative of b₂ in B
+  (same direction, same number of generations). A matched parent and child on
+  their own therefore count as 2 confirmed pairs. Controlled by
+  `directLinkMaxDepth` (default 2) in `config.ts`; set it to 0 to go back to
+  the strict rule.
+- **Spouses** (optional, off by default): a₁–a₂ married in A and b₁–b₂
+  married in B. Couples with common names are weak evidence, so this is
+  behind `allowSpouseLink` for tuning.
 
 "Connected in the same way" is the equal-distance check. Without it, a person
 listed as a grandchild in one tree could pair with a child in the other.
@@ -528,7 +343,8 @@ The cases from your test list come out like this:
 | Case | Result |
 |---|---|
 | one matched pair only | no suggestion |
-| two matched pairs, no matched relative | no suggestion |
+| two matched pairs, no relationship between them in either tree | no suggestion |
+| matched parent + matched child only | suggest (direct line, usually Low) |
 | matched siblings + matched parent | suggest (3 confirmed pairs) |
 | matched cousins via matched grandparent | suggest (distance 2 on both sides) |
 | matched parents via matched child | suggest (common descendant) |
@@ -538,7 +354,8 @@ The cases from your test list come out like this:
 
 Each confirmed pair contributes `similarity × weight(closest link)`, with
 weights 1.0 (sibling/parent/child), 0.7 (grandparent/grandchild) and 0.5
-(great-grandparent). The score is the sum. Starting bands, all in
+(great-grandparent), and 0.6 for spouse links when
+enabled. The score is the sum. Starting bands, all in
 `config.ts`: **High ≥ 4.0, Medium ≥ 2.5, Low otherwise.** I'll calibrate
 them against the fixtures with `scripts/tune-merge.ts`.
 
@@ -561,13 +378,15 @@ tree (N matching people)". The other tree's owners get a `ConnectionRequest`
 showing the matched people from **their own** tree. Accepting grants both
 sides read access for merging (see Q1).
 
-**Merge application** (`apply.ts`)
+**Merge application** (`apply.ts`): link, don't fold
 
-The user chooses a target tree. For every conflicting field in a matched
-pair, the user picks which value to keep. Matched source people get
-`mergedIntoId`. Unmatched source people and their relationships are copied
-into the target. The source tree gets `archivedAt` (it is not deleted). A
-`MergeOperation.before` snapshot makes undo exact.
+Both trees stay as they are. Accepting a suggestion creates a `PersonLink`
+for each matched pair the user keeps. For each conflicting field, the user
+picks which value to keep, and that value is written to **both** linked
+people. Each linked person shows "also in *Tree B*", and a tap jumps there.
+A `MergeOperation` records the links it created and snapshots every person
+row it changed, so undo removes the links and restores the old values
+exactly. The user can also unlink a single pair later.
 
 ---
 
@@ -585,21 +404,12 @@ The sharing *data model* goes in with phase 1, as you asked.
 
 ---
 
-## 7. Open questions (need answers before phase 1)
+## 7. Decisions (confirmed 2026-09-26)
 
-1. **What does "Accept merge" produce?** My proposal: tree B folds into tree A
-   (B is archived read-only, undo restores it), and members of both trees
-   become members of the result with their existing roles. The alternative is
-   to keep both trees and only link the matched people. That is less
-   disruptive, but it isn't really a merge.
-2. **Direct parent–child only.** If only a matched parent and their matched
-   child appear in both trees (2 people), the literal rule does **not**
-   trigger, because there is no third matched anchor. I plan to keep it
-   literal. OK?
-3. **Model and cost.** `claude-opus-5-5` gives the best handwriting accuracy.
-   `claude-sonnet-5` is cheaper per page. I'd default to Opus and make it one
-   env var (`ANTHROPIC_MODEL`). Preference?
-4. **UI language.** English only, or English + Bahasa Indonesia from the start?
-   I'd add i18n scaffolding (`next-intl`) either way. The name "silsilah" and
-   the bin/binti examples suggest Indonesian users.
-5. **Auth.** Is magic-link only (no passwords) acceptable?
+1. **Accept merge = link the matched people**; both trees are kept. Data
+   model: `PersonLink` + `MergeOperation` (no archiving of trees).
+2. **Direct parent–child counts**: the rule gains the "direct line" case above.
+3. **Model: `claude-sonnet-5`** (configurable via `ANTHROPIC_MODEL`).
+4. **UI in English and Bahasa Indonesia**, English first, language toggle at
+   the top of every page.
+5. **Magic-link sign-in only** (Auth.js + Resend).
