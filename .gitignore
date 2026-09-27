@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 /src/generated
 !.env.example
+
+# local agent handoff notes
+/docs/HANDOFF.md
