@@ -3,7 +3,7 @@ import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import { magicLinkEmail } from "@/lib/email/templates";
-import { sendEmail } from "@/lib/email/send";
+import { idempotencyKeyFor, sendEmail } from "@/lib/email/send";
 import { getLocaleFromCookies } from "@/i18n/locale";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -12,13 +12,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: "/login", verifyRequest: "/login/check-email", error: "/login" },
   providers: [
     Resend({
-      // The key is only used by our own sender below; Auth.js requires a value.
-      apiKey: process.env.RESEND_API_KEY ?? "dev",
-      from: process.env.EMAIL_FROM ?? "Silsilah <onboarding@resend.dev>",
+      // Sending is done by our own sendVerificationRequest (the Resend SDK in
+      // src/lib/email/send.ts); these two values only satisfy Auth.js.
+      apiKey: process.env.RESEND_API_KEY ?? "unset",
+      from: process.env.EMAIL_FROM ?? "unset",
       maxAge: 60 * 60, // magic links are valid for one hour
       async sendVerificationRequest({ identifier, url }) {
         const locale = await getLocaleFromCookies();
-        await sendEmail({ to: identifier, ...magicLinkEmail(url, locale) });
+        // Each link carries a fresh token, so the key is unique per request.
+        await sendEmail({
+          to: identifier,
+          ...magicLinkEmail(url, locale),
+          idempotencyKey: idempotencyKeyFor("magic-link", url),
+        });
       },
     }),
   ],

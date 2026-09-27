@@ -83,6 +83,27 @@ tokens live in `src/app/globals.css` and the shared components in
   white space. `AlbumFrame` (a white mat with photo corners) is the only
   "object" style, and it's reserved for photographs.
 
+## Email (Resend)
+
+Sign-in links (and later, invitations) are sent with the official `resend`
+SDK (`src/lib/email/send.ts`).
+
+1. Create an API key with **Sending access** at https://resend.com/api-keys
+   and set it as `RESEND_API_KEY`.
+2. Add and verify your domain at https://resend.com/domains, by adding the DNS
+   records Resend shows you.
+3. Set `EMAIL_FROM` to an address on that domain, e.g.
+   `Silsilah <noreply@yourdomain.com>`. There is no built-in fallback
+   sender. Resend's test sender `onboarding@resend.dev` only delivers to the
+   email address that owns the Resend account, so other people (including
+   the second admin) never receive anything.
+4. Redeploy.
+
+**If sign-in emails don't arrive:** the login page says "We couldn't send
+the sign-in email". The exact reason is in the Vercel logs: open **Project →
+Logs**, search for `[email]`, and read the hint on the line below it. Typical
+causes are an unverified domain, the test sender, or a wrong API key.
+
 ## Super admins
 
 Admins are set with the `ADMIN_EMAILS` environment variable, a comma-separated
@@ -130,8 +151,7 @@ truncates its tables. Never point `DATABASE_URL_TEST` at data you care about.
    (direct).
 3. Add the remaining environment variables from `.env.example`:
    - `AUTH_SECRET`
-   - `RESEND_API_KEY` and `EMAIL_FROM` (the address must be on a domain
-     verified in Resend)
+   - `RESEND_API_KEY` and `EMAIL_FROM` (see **Email** below)
    - `ANTHROPIC_API_KEY` (from console.anthropic.com; set a monthly spend limit there)
    - optionally `EXTRACTION_DAILY_LIMIT` (pages per user per day, default 60)
    - `CRON_SECRET`

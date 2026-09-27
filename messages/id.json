@@ -40,7 +40,9 @@
     "error": "Terjadi kesalahan saat masuk. Silakan coba lagi.",
     "inviteHint": "Masuk atau buat akun untuk bergabung dengan silsilah yang mengundang Anda.",
     "eyebrow": "Selamat datang",
-    "emailHint": "Kami akan mengirim tautan lewat email. Tidak ada kata sandi yang perlu diingat."
+    "emailHint": "Kami akan mengirim tautan lewat email. Tidak ada kata sandi yang perlu diingat.",
+    "errorEmail": "Email masuk tidak dapat dikirim saat ini. Silakan coba lagi beberapa menit lagi. Jika terus terjadi, pengaturan email situs perlu diperiksa.",
+    "errorExpired": "Tautan masuk itu sudah kedaluwarsa atau sudah dipakai. Masukkan email Anda lagi untuk mendapatkan tautan baru."
   },
   "trees": {
     "title": "Silsilah saya",
