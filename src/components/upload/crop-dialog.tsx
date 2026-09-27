@@ -38,7 +38,7 @@ export function CropDialog({ blob, onApply, onClose }: Props) {
       ref={ref}
       onClose={onClose}
       aria-labelledby="crop-title"
-      className="m-auto w-[min(100vw-2rem,48rem)] max-h-[calc(100dvh-2rem)] border border-rule bg-paper p-0 text-ink backdrop:bg-ink/60"
+      className="m-auto w-[min(100vw-2rem,48rem)] max-h-[calc(100dvh-2rem)] neo-card bg-paper p-0 text-ink backdrop:bg-black/60"
     >
       <div className="flex flex-col gap-5 p-5 sm:p-8">
         <div className="flex flex-col gap-2">

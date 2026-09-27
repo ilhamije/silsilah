@@ -27,7 +27,7 @@ export default async function AdminPage() {
         {stats.map(([label, value]) => (
           <div key={label} className="flex flex-col gap-1 border-b border-rule py-6 pr-4">
             <dt className="text-sm text-ink-muted">{label}</dt>
-            <dd className="font-serif text-[2.75rem] leading-none tabular-nums">{value}</dd>
+            <dd className="font-display text-[2.75rem] leading-none tabular-nums">{value}</dd>
           </div>
         ))}
       </dl>

@@ -2,23 +2,26 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { auth, signOut } from "@/auth";
 import { isAdminEmail } from "@/lib/authz/admin";
+import type { Theme } from "@/lib/theme";
 import { LanguageToggle } from "./language-toggle";
+import { ThemeToggle } from "./theme-toggle";
 
 const navLink =
-  "inline-flex min-h-11 items-center px-2 text-base font-medium text-accent underline decoration-transparent decoration-1 underline-offset-[6px] hover:text-accent-strong hover:decoration-current";
+  "inline-flex min-h-11 items-center px-2 text-base font-semibold text-accent underline decoration-transparent decoration-3 underline-offset-[6px] hover:text-accent-strong hover:decoration-current";
 
-export async function SiteHeader() {
+export async function SiteHeader({ theme }: { theme: Theme }) {
   const [session, t] = await Promise.all([auth(), getTranslations()]);
   const signedIn = !!session?.user;
   return (
-    <header className="border-b border-rule bg-paper">
+    <header className="border-b-4 border-ink bg-paper">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3 sm:px-8">
         <Link
           href={signedIn ? "/trees" : "/"}
-          className="mr-auto inline-flex min-h-11 items-center font-serif text-[1.875rem] leading-none text-ink no-underline hover:text-accent"
+          className="mr-auto inline-flex min-h-11 items-center font-display text-[1.875rem] font-bold leading-none tracking-tight text-ink no-underline hover:text-accent"
         >
           {t("app.name")}
         </Link>
+        <ThemeToggle current={theme} />
         <LanguageToggle />
         {!signedIn && (
           <Link href="/login" className={navLink}>

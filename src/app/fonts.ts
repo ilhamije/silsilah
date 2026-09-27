@@ -1,20 +1,19 @@
-import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
+import { Google_Sans_Flex, Inter } from "next/font/google";
 
 // Self-hosted by next/font at build time: no request to Google from visitors.
 
-/** Headings. Instrument Serif ships a single regular weight, plus italics for storytelling. */
-export const serif = Instrument_Serif({
+/** Headings and display text. Variable font; opsz and wdth give the wide, heavy headline cut. */
+export const display = Google_Sans_Flex({
   subsets: ["latin", "latin-ext"],
-  weight: "400",
-  style: ["normal", "italic"],
+  axes: ["opsz", "wdth"],
   display: "swap",
-  variable: "--font-instrument-serif",
+  variable: "--font-google-sans-flex",
 });
 
 /** Body, navigation and data. Variable font, so all weights come in one file. */
-export const sans = Plus_Jakarta_Sans({
+export const sans = Inter({
   subsets: ["latin", "latin-ext"],
   style: ["normal", "italic"],
   display: "swap",
-  variable: "--font-plus-jakarta",
+  variable: "--font-inter",
 });

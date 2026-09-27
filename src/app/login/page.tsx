@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { auth, signIn } from "@/auth";
 import { Button, Field, Input, Notice, PageHeader } from "@/components/ui";
+import { passwordLoginSecret } from "@/lib/password-login";
 import { safeRedirect } from "@/lib/safe-redirect";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
@@ -58,6 +60,14 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
             {t("submit")}
           </Button>
         </form>
+        {passwordLoginSecret() && (
+          <Link
+            href={`/login/password${callbackUrl === "/trees" ? "" : `?callbackUrl=${encodeURIComponent(callbackUrl)}`}`}
+            className="self-start"
+          >
+            {t("passwordLink")}
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -10,7 +10,10 @@
     "language": "Bahasa",
     "skipToContent": "Langsung ke konten",
     "admin": "Admin",
-    "main": "Utama"
+    "main": "Utama",
+    "theme": "Kecerahan",
+    "themeLight": "Terang",
+    "themeDim": "Redup"
   },
   "home": {
     "cta": "Mulai arsip keluarga Anda",
@@ -42,7 +45,14 @@
     "eyebrow": "Selamat datang",
     "emailHint": "Kami akan mengirim tautan lewat email. Tidak ada kata sandi yang perlu diingat.",
     "errorEmail": "Email masuk tidak dapat dikirim saat ini. Silakan coba lagi beberapa menit lagi. Jika terus terjadi, pengaturan email situs perlu diperiksa.",
-    "errorExpired": "Tautan masuk itu sudah kedaluwarsa atau sudah dipakai. Masukkan email Anda lagi untuk mendapatkan tautan baru."
+    "errorExpired": "Tautan masuk itu sudah kedaluwarsa atau sudah dipakai. Masukkan email Anda lagi untuk mendapatkan tautan baru.",
+    "passwordLink": "Masuk dengan kata sandi",
+    "passwordTitle": "Masuk dengan kata sandi",
+    "passwordIntro": "Cara masuk sementara selama pengiriman email sedang disiapkan. Masukkan email Anda dan kata sandi yang diberikan kepada Anda. Baru di sini? Akun Anda dibuat saat Anda masuk.",
+    "password": "Kata sandi",
+    "passwordSubmit": "Masuk",
+    "passwordError": "Email atau kata sandi tidak sesuai. Silakan coba lagi.",
+    "passwordBack": "Masuk dengan tautan email"
   },
   "trees": {
     "title": "Silsilah saya",

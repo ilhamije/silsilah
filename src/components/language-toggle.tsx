@@ -10,8 +10,8 @@ const labels = { en: "English", id: "Indonesia" } as const;
 const short = { en: "EN", id: "ID" } as const;
 
 /**
- * Always at the top of the page. The current language is a filled Heritage
- * Blue segment; the other is outlined, so the choice is clear without colour.
+ * Always at the top of the page. The current language is a filled ink
+ * segment; the other is outlined, so the choice is clear without colour.
  */
 export function LanguageToggle() {
   const current = useLocale();
@@ -20,7 +20,7 @@ export function LanguageToggle() {
   const [pending, startTransition] = useTransition();
 
   return (
-    <div role="group" aria-label={t("language")} className="inline-flex rounded-[4px] border-[1.5px] border-accent">
+    <div role="group" aria-label={t("language")} className="inline-flex overflow-hidden rounded-full border-3 border-ink shadow-neo-sm">
       {locales.map((locale) => {
         const active = locale === current;
         return (
@@ -36,8 +36,8 @@ export function LanguageToggle() {
                 router.refresh();
               })
             }
-            className={`min-h-11 min-w-12 cursor-pointer px-3 text-sm font-semibold transition-colors ${
-              active ? "bg-accent text-white" : "bg-transparent text-accent hover:bg-accent-tint hover:underline hover:underline-offset-4"
+            className={`min-h-11 min-w-12 cursor-pointer px-4 text-sm font-semibold transition-colors ${
+              active ? "bg-accent text-paper" : "bg-transparent text-accent hover:bg-accent-tint hover:underline hover:underline-offset-4"
             }`}
           >
             <span aria-hidden className="sm:hidden">{short[locale]}</span>

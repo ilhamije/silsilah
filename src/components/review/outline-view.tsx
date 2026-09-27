@@ -14,7 +14,7 @@ export function OutlineView({ draft, nameOf }: { draft: ReviewDraft; nameOf: (id
     <ul className={depth ? "ml-3 flex flex-col gap-2 border-l border-rule pl-4 sm:ml-5 sm:pl-6" : "flex flex-col gap-3"}>
       {nodes.map((n) => (
         <li key={n.people.join("+")} className="flex flex-col gap-2">
-          <span className="font-serif text-xl">
+          <span className="font-display text-xl">
             {n.people.map((id, i) => (
               <span key={id}>
                 {i > 0 && <span className="text-ink-muted"> = </span>}
@@ -36,7 +36,7 @@ export function OutlineView({ draft, nameOf }: { draft: ReviewDraft; nameOf: (id
       {alone.length > 0 && (
         <div className="flex flex-col gap-2">
           <p className="eyebrow">{t("unplaced")}</p>
-          <p className="font-serif text-xl">{alone.map(nameOf).join(" · ")}</p>
+          <p className="font-display text-xl">{alone.map(nameOf).join(" · ")}</p>
         </div>
       )}
     </section>

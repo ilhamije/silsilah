@@ -311,7 +311,7 @@ export function UploadWorkspace({ treeId }: { treeId: string }) {
 
           {reading ? (
             <div role="status" aria-live="polite" className="flex flex-col gap-3 border-t border-rule pt-8">
-              <p className="font-serif text-2xl">
+              <p className="font-display text-2xl">
                 {reading.retrying ? t("retrying") : t("reading", { n: reading.position, total: reading.total })}
               </p>
               <progress
@@ -325,7 +325,7 @@ export function UploadWorkspace({ treeId }: { treeId: string }) {
           ) : (
             <div className="flex flex-col gap-6 border-t border-rule pt-8">
               {unread === 0 && accepted.length > 0 && (
-                <p className="font-serif text-2xl">
+                <p className="font-display text-2xl">
                   {t("summary", { people: combined.people.length, pages: accepted.length })}
                 </p>
               )}
@@ -395,7 +395,7 @@ function PageCard(props: CardProps) {
             <img src={url} alt={label} className="mx-auto max-h-80 w-auto object-contain" />
           )}
         </AlbumFrame>
-        <figcaption className="text-center font-serif text-xl italic text-ink-muted">{label}</figcaption>
+        <figcaption className="text-center font-display text-xl italic text-ink-muted">{label}</figcaption>
       </figure>
 
       <div role="group" aria-label={label} className="flex flex-wrap justify-center gap-x-1 border-y border-rule py-1">

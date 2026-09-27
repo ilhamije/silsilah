@@ -161,14 +161,14 @@ export function ReviewWorkspace({ treeId, treeName, existingPeople, existingEdge
 
       {/* On phones: switch between the data and the photo. Side by side from lg up. */}
       <div className="sticky top-0 z-10 -mx-5 border-b border-rule bg-paper px-5 py-2 sm:-mx-8 sm:px-8 lg:hidden">
-        <div role="group" aria-label={t("viewLabel")} className="inline-flex rounded-[4px] border-[1.5px] border-accent">
+        <div role="group" aria-label={t("viewLabel")} className="inline-flex overflow-hidden rounded-full border-3 border-ink shadow-neo-sm">
           {(["details", "photo"] as const).map((v) => (
             <button
               key={v}
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`min-h-11 min-w-28 cursor-pointer px-4 font-semibold ${view === v ? "bg-accent text-white" : "text-accent hover:bg-accent-tint"}`}
+              className={`min-h-11 min-w-28 cursor-pointer px-4 font-semibold ${view === v ? "bg-accent text-paper" : "text-accent hover:bg-accent-tint"}`}
             >
               {v === "details" ? t("viewDetails") : t("viewPhoto")}
             </button>

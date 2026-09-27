@@ -10,7 +10,10 @@
     "language": "Language",
     "skipToContent": "Skip to content",
     "admin": "Admin",
-    "main": "Main"
+    "main": "Main",
+    "theme": "Brightness",
+    "themeLight": "Light",
+    "themeDim": "Dim"
   },
   "home": {
     "cta": "Begin your family archive",
@@ -42,7 +45,14 @@
     "eyebrow": "Welcome",
     "emailHint": "We'll email you a link. There is no password to remember.",
     "errorEmail": "We couldn't send the sign-in email just now. Please try again in a few minutes. If it keeps happening, the site's email settings need attention.",
-    "errorExpired": "That sign-in link has expired or was already used. Enter your email again for a new one."
+    "errorExpired": "That sign-in link has expired or was already used. Enter your email again for a new one.",
+    "passwordLink": "Sign in with a password instead",
+    "passwordTitle": "Sign in with a password",
+    "passwordIntro": "A temporary way in while email sign-in is being set up. Enter your email and the password you were given. New here? Your account is created when you sign in.",
+    "password": "Password",
+    "passwordSubmit": "Sign in",
+    "passwordError": "That email or password isn't right. Please try again.",
+    "passwordBack": "Sign in with an email link instead"
   },
   "trees": {
     "title": "My trees",

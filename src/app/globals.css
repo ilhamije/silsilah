@@ -1,28 +1,56 @@
 @import "tailwindcss";
 
 /*
- * Silsilah design system: archival, editorial, calm.
- * Three brand colours; everything else is derived from them and checked for
- * contrast on --paper (WCAG ratios noted).
+ * Silsilah design system: rounded neo-brutalist. Thick ink borders, hard
+ * offset shadows, soft corners (pill buttons, rounded fields and cards) and four flat brand colours. Light by default,
+ * with a user-chosen Dim variant for evenings.
+ *
+ * Text on the brand colours (pink, yellow, mint, orange) is always
+ * --on-brand (black). They are never used as text colours: on white they fall
+ * far below WCAG contrast. Ratios are WCAG contrast against --paper.
  */
 :root {
   color-scheme: light;
 
   /* Brand */
-  --paper: #fbfbfa; /* Warm Alabaster: page background */
-  --ink: #1e2229; /* Inkwell Charcoal: text, borders (15.4:1) */
-  --accent: #2b4c6f; /* Heritage Blue: every interactive element (8.6:1) */
+  --pink: #f5d6f1; /* primary fills: main buttons */
+  --yellow: #ffe509; /* selection, decoration */
+  --mint: #64ffca; /* eyebrow labels, progress */
+  --orange: #ff6600; /* "please check" markers (borders and fills only, never text) */
+  --on-brand: #000000; /* text on any brand fill (15.8:1 on pink) */
 
-  /* Derived */
-  --ink-muted: #565b63; /* secondary text (6.6:1) */
-  --accent-strong: #1f3a56; /* hover / pressed (11.3:1) */
-  --accent-tint: #e8edf2; /* selected rows, hover wash */
-  --mat: #ffffff; /* photo-mount "mat" inside album frames */
-  --rule: rgb(30 34 41 / 0.12); /* 1px structural lines */
-  --rule-strong: rgb(30 34 41 / 0.5); /* form-field borders (3:1 non-text contrast) */
-  --notice: #f5ecd9; /* amber wash for "please check" states */
-  --notice-ink: #6b4a12; /* (6.8:1 on --notice) */
-  --danger: #8c2f24; /* (8.0:1) */
+  --paper: #ffffff; /* page background */
+  --ink: #000000; /* text, borders, shadows (21:1) */
+  --ink-muted: #595959; /* secondary text (7.0:1) */
+  --accent: var(--ink); /* links and interactive text: brand colours are too light for text */
+  --accent-strong: var(--ink);
+  --accent-tint: #f5d6f1; /* selected rows, hover wash (ink 15.8:1, muted 5.3:1) */
+  --mat: #ffffff; /* cards, inputs, photo mounts */
+  --rule: var(--ink); /* structural lines */
+  --rule-strong: var(--ink); /* form-field borders */
+  --notice: #ffe3d1; /* orange wash for "please check" states (ink 17.2:1, muted 5.7:1) */
+  --notice-ink: #8a3300; /* (6.7:1 on --notice) */
+  --danger: #c4001f; /* (6.2:1) */
+}
+
+/*
+ * Dim: the same light theme with less glare, for evening use. Chosen by the
+ * user (Light / Dim switch in the header), never by the system setting.
+ */
+[data-theme="dim"] {
+  --pink: #d4b8cf;
+  --yellow: #d9c308;
+  --mint: #52d6a9;
+  --orange: #e05a00;
+
+  --paper: #d6d3cc; /* warm grey */
+  --ink: #141414; /* (12.3:1) */
+  --ink-muted: #404040; /* (6.9:1; 7.8:1 on --mat) */
+  --accent-tint: #d4b8cf; /* (ink 10.1:1, muted 5.7:1) */
+  --mat: #e2dfd8;
+  --notice: #e6cbb8; /* (ink 11.9:1, muted 6.7:1) */
+  --notice-ink: #6e2900; /* (6.9:1 on --notice) */
+  --danger: #9e0019; /* (5.7:1) */
 }
 
 @theme inline {
@@ -38,9 +66,24 @@
   --color-notice: var(--notice);
   --color-notice-ink: var(--notice-ink);
   --color-danger: var(--danger);
+  --color-pink: var(--pink);
+  --color-yellow: var(--yellow);
+  --color-mint: var(--mint);
+  --color-orange: var(--orange);
+  --color-on-brand: var(--on-brand);
 
-  --font-serif: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
-  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-google-sans-flex), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Corners: pills for buttons, toggles and tags; these for fields and cards. */
+  --radius-field: 0.875rem;
+  --radius-card: 1.25rem;
+
+  /* Hard offset shadows in the ink colour. */
+  --shadow-neo-lg: 8px 8px 0 0 var(--ink);
+  --shadow-neo: 6px 6px 0 0 var(--ink);
+  --shadow-neo-sm: 4px 4px 0 0 var(--ink);
+  --shadow-neo-xs: 2px 2px 0 0 var(--ink);
 
   /*
    * Type scale shifted up for readers 40+: nothing renders below 15px, and
@@ -77,19 +120,20 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    letter-spacing: -0.005em;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variation-settings: "opsz" 112, "wdth" 112;
+    letter-spacing: -0.02em;
     text-wrap: balance;
     color: var(--ink);
   }
   h1 {
     font-size: clamp(2.5rem, 1.9rem + 3vw, 3.75rem);
-    line-height: 1.08;
+    line-height: 1.05;
   }
   h2 {
     font-size: clamp(1.875rem, 1.6rem + 1.2vw, 2.375rem);
-    line-height: 1.15;
+    line-height: 1.12;
   }
   h3 {
     font-size: 1.625rem;
@@ -100,28 +144,27 @@
     text-wrap: pretty;
   }
 
-  /* Links are always recognisable: Heritage Blue and underlined. */
+  /* Links are always recognisable: ink-coloured and underlined. */
   a {
     color: var(--accent);
     text-decoration-line: underline;
-    text-decoration-thickness: 1px;
+    text-decoration-thickness: 2px;
     text-underline-offset: 0.2em;
   }
   a:hover {
     color: var(--accent-strong);
-    text-decoration-thickness: 2px;
+    text-decoration-thickness: 4px;
   }
 
   /* One unmistakable focus style for keyboard users, everywhere. */
   :focus-visible {
-    outline: 3px solid var(--accent);
+    outline: 3px solid var(--ink);
     outline-offset: 3px;
-    border-radius: 2px;
   }
 
   ::selection {
-    background: var(--accent-tint);
-    color: var(--ink);
+    background: var(--yellow);
+    color: var(--on-brand);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -140,24 +183,44 @@
     max-width: 65ch;
   }
 
-  /* Small letter-spaced label, like a caption on an archive box. */
+  /* Small uppercase label on a mint tag. */
   .eyebrow {
+    width: fit-content;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--mint);
+    color: var(--on-brand);
+    padding: 0.1em 0.6em;
     font-family: var(--font-sans);
     font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--ink-muted);
+  }
+
+  /* Text and links on a brand fill are always black. */
+  .on-brand,
+  .on-brand a {
+    color: var(--on-brand);
+  }
+
+  /* A card: thick ink border, hard shadow. */
+  .neo-card {
+    border: 4px solid var(--ink);
+    border-radius: var(--radius-card);
+    background: var(--mat);
+    box-shadow: var(--shadow-neo);
   }
 
   /*
-   * A mounted photograph: white mat, hairline edge and four photo corners.
-   * Flat on purpose (no drop shadow).
+   * A mounted photograph: a card with four photo corners.
    */
   .album-frame {
     position: relative;
     background: var(--mat);
-    border: 1px solid var(--rule);
+    border: 4px solid var(--ink);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-neo);
     padding: clamp(1rem, 4vw, 1.75rem);
   }
   .album-frame > .corner {
@@ -165,37 +228,41 @@
     width: 22px;
     height: 22px;
     border-color: var(--ink);
-    opacity: 0.55;
   }
-  .album-frame > .corner.tl { top: 8px; left: 8px; border-top: 1px solid; border-left: 1px solid; }
-  .album-frame > .corner.tr { top: 8px; right: 8px; border-top: 1px solid; border-right: 1px solid; }
-  .album-frame > .corner.bl { bottom: 8px; left: 8px; border-bottom: 1px solid; border-left: 1px solid; }
-  .album-frame > .corner.br { bottom: 8px; right: 8px; border-bottom: 1px solid; border-right: 1px solid; }
+  .album-frame > .corner.tl { top: 12px; left: 12px; border-top: 3px solid; border-left: 3px solid; }
+  .album-frame > .corner.tr { top: 12px; right: 12px; border-top: 3px solid; border-right: 3px solid; }
+  .album-frame > .corner.bl { bottom: 12px; left: 12px; border-bottom: 3px solid; border-left: 3px solid; }
+  .album-frame > .corner.br { bottom: 12px; right: 12px; border-bottom: 3px solid; border-right: 3px solid; }
 }
 
-/* react-image-crop: larger, Heritage Blue handles that are easy to grab with a thumb. */
+/* react-image-crop: larger, ink handles that are easy to grab with a thumb. */
 .silsilah-crop .ReactCrop {
   --rc-drag-handle-size: 18px;
   --rc-drag-handle-mobile-size: 32px;
-  --rc-drag-handle-bg-colour: var(--accent);
+  --rc-drag-handle-bg-colour: var(--mint);
   --rc-border-color: #ffffff;
-  --rc-focus-color: var(--accent);
+  --rc-focus-color: var(--mint);
 }
 
-/* Determinate progress bar: hairline track, Heritage Blue fill. */
+/* Determinate progress bar: ink-bordered track, mint fill. */
 .silsilah-progress {
   appearance: none;
-  border: 0;
-  background: var(--accent-tint);
-  accent-color: var(--accent);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--mat);
+  accent-color: var(--mint);
 }
 .silsilah-progress::-webkit-progress-bar {
-  background: var(--accent-tint);
+  border-radius: 999px;
+  background: var(--mat);
 }
 .silsilah-progress::-webkit-progress-value {
-  background: var(--accent);
+  border-radius: 999px;
+  background: var(--mint);
   transition: width 0.3s ease;
 }
 .silsilah-progress::-moz-progress-bar {
-  background: var(--accent);
+  border-radius: 999px;
+  background: var(--mint);
 }

@@ -71,7 +71,7 @@ export function Attention({ draft, apply, existingPeople, issues, toCheck, nameO
               {q.kind === "draft" ? (
                 <>
                   <p className="font-semibold">{t("samePersonQ")}</p>
-                  <p className="font-serif text-2xl">
+                  <p className="font-display text-2xl">
                     {label(q.a)} <span className="text-ink-muted">·</span> {label(q.b)}
                   </p>
                   <div className="flex flex-wrap gap-3">
@@ -86,7 +86,7 @@ export function Attention({ draft, apply, existingPeople, issues, toCheck, nameO
               ) : (
                 <>
                   <p className="font-semibold">{t("existingQ", { name: q.existing.fullName })}</p>
-                  <p className="font-serif text-2xl">
+                  <p className="font-display text-2xl">
                     {label(q.a)} <span className="text-ink-muted">·</span>{" "}
                     {[q.existing.fullName, q.existing.birthDate].filter(Boolean).join(", ")}
                   </p>

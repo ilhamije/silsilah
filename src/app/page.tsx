@@ -20,7 +20,7 @@ export default async function Home() {
         <div className="flex flex-col gap-6">
           <p className="eyebrow">{t("eyebrow")}</p>
           <h1>
-            {t("headline")} <em className="italic">{t("headlineEm")}</em>
+            {t("headline")} <em className="box-decoration-clone bg-yellow px-2 not-italic text-on-brand">{t("headlineEm")}</em>
           </h1>
           <p className="measure text-lg text-ink-muted">{t("lede")}</p>
           <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -33,7 +33,7 @@ export default async function Home() {
           <AlbumFrame className="rotate-[-0.6deg]">
             <TreeSketch />
           </AlbumFrame>
-          <figcaption className="text-center font-serif text-lg italic text-ink-muted">{t("caption")}</figcaption>
+          <figcaption className="text-center font-display text-lg italic text-ink-muted">{t("caption")}</figcaption>
         </figure>
       </section>
 
@@ -42,7 +42,7 @@ export default async function Home() {
         <ol className="flex flex-col">
           {steps.map((step, i) => (
             <li key={i} className="grid grid-cols-[3rem_1fr] gap-4 border-t border-rule py-8 sm:grid-cols-[5rem_1fr]">
-              <span aria-hidden className="font-serif text-[2.75rem] leading-none text-accent">
+              <span aria-hidden className="flex size-12 items-center justify-center rounded-full border-3 border-ink bg-yellow font-display text-2xl font-bold text-on-brand shadow-neo-xs sm:size-14">
                 {i + 1}
               </span>
               <div className="flex flex-col gap-2">
@@ -53,7 +53,7 @@ export default async function Home() {
           ))}
         </ol>
         <Rule />
-        <p className="measure font-serif text-2xl italic leading-snug">{t("privacy")}</p>
+        <p className="measure font-display text-2xl italic leading-snug">{t("privacy")}</p>
       </section>
     </div>
   );

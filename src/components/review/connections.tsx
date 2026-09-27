@@ -15,7 +15,7 @@ import type { ApplyDraft } from "./review-workspace";
 
 type Props = { draft: ReviewDraft; apply: ApplyDraft; nameOf: (id: string) => string };
 
-const selectClass = "min-h-13 w-full rounded-[4px] border border-rule-strong bg-mat px-3 text-base";
+const selectClass = "min-h-13 w-full rounded-field border-3 border-rule-strong bg-mat shadow-neo-sm px-3 text-base";
 const newId = () => `rm${crypto.randomUUID().replace(/-/g, "").slice(0, 10)}`;
 
 export function Connections({ draft, apply, nameOf }: Props) {
@@ -55,7 +55,7 @@ export function Connections({ draft, apply, nameOf }: Props) {
         {draft.relationships.map((r) => {
           const flagged = relationshipNeedsCheck(r);
           return (
-            <li key={r.id} className={`flex flex-col gap-2 border-b border-rule px-3 py-4 sm:flex-row sm:items-center sm:justify-between ${flagged ? "bg-notice" : ""}`}>
+            <li key={r.id} className={`flex flex-col gap-2 border-b border-rule px-3 py-4 sm:flex-row sm:items-center sm:justify-between ${flagged ? "border-l-[8px] border-l-orange bg-notice" : ""}`}>
               <span>
                 {r.type === "PARENT_CHILD"
                   ? t("parentOf", { parent: nameOf(r.from), child: nameOf(r.to) })
@@ -82,8 +82,8 @@ export function Connections({ draft, apply, nameOf }: Props) {
         })}
       </ul>
 
-      <fieldset className="mt-4 flex flex-col gap-4 border border-rule p-4 sm:p-6">
-        <legend className="px-2 font-serif text-2xl">{t("addConnection")}</legend>
+      <fieldset className="mt-4 flex flex-col gap-4 rounded-card border-3 border-ink p-4 sm:p-6">
+        <legend className="px-2 font-display text-2xl">{t("addConnection")}</legend>
         <div className="grid gap-4 md:grid-cols-3">
           <div className="flex flex-col gap-2">
             <label htmlFor="add-link-personA" className="font-semibold">

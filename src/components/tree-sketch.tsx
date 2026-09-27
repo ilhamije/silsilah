@@ -3,7 +3,7 @@
  * "photograph". Pure SVG in the brand ink colour; decorative only.
  */
 export function TreeSketch() {
-  const name = "font-serif italic fill-ink";
+  const name = "font-display italic fill-ink";
   return (
     <svg viewBox="0 0 360 240" role="img" aria-hidden className="h-auto w-full">
       <g className="stroke-ink" strokeWidth="1.25" fill="none" strokeLinecap="round" opacity="0.8">

@@ -112,10 +112,10 @@ function PersonItem({ person: p, draft, apply, existingPeople, open, focused, on
   }
 
   return (
-    <li className={`border-b border-rule ${flagged ? "bg-notice" : ""} ${focused ? "outline outline-2 -outline-offset-2 outline-accent" : ""}`}>
+    <li className={`border-b border-rule ${flagged ? "border-l-[8px] border-l-orange bg-notice" : ""} ${focused ? "outline outline-2 -outline-offset-2 outline-accent" : ""}`}>
       <div className="flex items-start justify-between gap-4 px-3 py-4">
         <div className="flex min-w-0 flex-col gap-1">
-          <span className="font-serif text-2xl break-words">{p.fullName || t("newPersonName")}</span>
+          <span className="font-display text-2xl break-words">{p.fullName || t("newPersonName")}</span>
           {details && <span className="text-sm text-ink-muted">{details}</span>}
           <span className="flex flex-wrap gap-x-3 text-sm">
             {flagged && (
@@ -155,7 +155,7 @@ function PersonItem({ person: p, draft, apply, existingPeople, open, focused, on
             />
           </FieldShell>
 
-          <fieldset className={`flex flex-col gap-2 ${fieldNeedsCheck(p, "gender") ? "bg-notice p-3" : ""}`}>
+          <fieldset className={`flex flex-col gap-2 ${fieldNeedsCheck(p, "gender") ? "rounded-field border-l-[8px] border-l-orange bg-notice p-3" : ""}`}>
             <legend className="mb-2 font-semibold">
               {t("gender")}
               {fieldNeedsCheck(p, "gender") && <CheckTag />}
@@ -188,7 +188,7 @@ function PersonItem({ person: p, draft, apply, existingPeople, open, focused, on
               value={p.notes}
               rows={3}
               onChange={(e) => set({ notes: e.target.value })}
-              className="w-full rounded-[4px] border border-rule-strong bg-mat px-4 py-3 text-base focus:border-accent"
+              className="w-full rounded-field border-3 border-rule-strong bg-mat shadow-neo-sm px-4 py-3 text-base focus:border-accent"
             />
           </FieldShell>
 
@@ -197,7 +197,7 @@ function PersonItem({ person: p, draft, apply, existingPeople, open, focused, on
               id={`${p.id}-living`}
               value={p.livingOverride === null ? "auto" : p.livingOverride ? "yes" : "no"}
               onChange={(e) => set({ livingOverride: e.target.value === "auto" ? null : e.target.value === "yes" })}
-              className="min-h-13 w-full rounded-[4px] border border-rule-strong bg-mat px-3 text-base"
+              className="min-h-13 w-full rounded-field border-3 border-rule-strong bg-mat shadow-neo-sm px-3 text-base"
             >
               <option value="auto">{t("livingAuto")}</option>
               <option value="yes">{t("livingYes")}</option>
@@ -211,7 +211,7 @@ function PersonItem({ person: p, draft, apply, existingPeople, open, focused, on
                 id={`${p.id}-merge`}
                 value={mergeTarget}
                 onChange={(e) => setMergeTarget(e.target.value)}
-                className="min-h-13 min-w-0 flex-1 rounded-[4px] border border-rule-strong bg-mat px-3 text-base"
+                className="min-h-13 min-w-0 flex-1 rounded-field border-3 border-rule-strong bg-mat shadow-neo-sm px-3 text-base"
               >
                 <option value="">{t("mergeChoose")}</option>
                 <optgroup label={t("draftGroup")}>
@@ -267,7 +267,7 @@ function CheckTag() {
 
 function FieldShell({ id, label, hint, flagged, children }: { id: string; label: string; hint?: string; flagged?: boolean; children: ReactNode }) {
   return (
-    <div className={`flex flex-col gap-2 ${flagged ? "bg-notice p-3" : ""}`}>
+    <div className={`flex flex-col gap-2 ${flagged ? "rounded-field border-l-[8px] border-l-orange bg-notice p-3" : ""}`}>
       <label htmlFor={id} className="font-semibold">
         {label}
         {flagged && <CheckTag />}

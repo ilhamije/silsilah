@@ -38,8 +38,8 @@ export function PhotoPanel({ pages, draft, focusId }: Props) {
               type="button"
               aria-pressed={i === pageIndex}
               onClick={() => setChosen(i)}
-              className={`min-h-11 cursor-pointer rounded-[4px] border-[1.5px] border-accent px-3 text-sm font-semibold ${
-                i === pageIndex ? "bg-accent text-white" : "text-accent hover:bg-accent-tint"
+              className={`min-h-11 cursor-pointer rounded-full border-3 border-ink px-4 text-sm font-semibold ${
+                i === pageIndex ? "bg-accent text-paper" : "text-accent hover:bg-accent-tint"
               }`}
             >
               {t("photoPage", { n: i + 1 })}
@@ -57,7 +57,7 @@ export function PhotoPanel({ pages, draft, focusId }: Props) {
               <div
                 role="img"
                 aria-label={t("highlightLabel", { name: focused!.fullName })}
-                className="pointer-events-none absolute border-[3px] border-accent bg-accent/10"
+                className="pointer-events-none absolute rounded-md border-4 border-orange bg-orange/15 shadow-[0_0_0_2px_#000]"
                 style={{
                   left: `${Math.max(0, box[0] - 0.01) * 100}%`,
                   top: `${Math.max(0, box[1] - 0.01) * 100}%`,
@@ -72,7 +72,7 @@ export function PhotoPanel({ pages, draft, focusId }: Props) {
         )}
       </AlbumFrame>
       {focused && (
-        <p className="text-center font-serif text-xl italic">
+        <p className="text-center font-display text-xl italic">
           {focused.fullName} · {t("photoPage", { n: pageIndex + 1 })}
         </p>
       )}

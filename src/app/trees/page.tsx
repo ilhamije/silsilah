@@ -25,14 +25,14 @@ export default async function TreesPage() {
       />
 
       {trees.length > 0 && (
-        <ul className="flex flex-col border-t border-rule">
+        <ul className="flex flex-col gap-6">
           {trees.map((tree) => (
-            <li key={tree.id} className="border-b border-rule">
+            <li key={tree.id}>
               <Link
                 href={`/trees/${tree.id}`}
-                className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 py-7 text-ink no-underline transition-colors hover:bg-accent-tint/60 sm:px-4"
+                className="neo-card group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-5 py-6 text-ink no-underline transition-[translate,box-shadow,background-color] duration-150 hover:translate-x-0.5 hover:translate-y-0.5 hover:bg-accent-tint hover:text-ink hover:shadow-neo-sm sm:px-6"
               >
-                <span className="font-serif text-[1.875rem] leading-tight group-hover:text-accent">{tree.name}</span>
+                <span className="font-display text-[1.875rem] font-bold leading-tight">{tree.name}</span>
                 <span aria-hidden className="row-span-2 text-2xl text-accent transition-transform group-hover:translate-x-1">
                   →
                 </span>
@@ -47,7 +47,7 @@ export default async function TreesPage() {
         </ul>
       )}
 
-      <section aria-labelledby="new-tree-heading" className="mt-16 grid gap-8 border-t border-rule pt-10 md:grid-cols-[1fr_1.4fr]">
+      <section aria-labelledby="new-tree-heading" className="mt-16 grid gap-8 border-t-4 border-ink pt-10 md:grid-cols-[1fr_1.4fr]">
         <div className="flex flex-col gap-3">
           <h2 id="new-tree-heading">{t("trees.create")}</h2>
           <p className="measure text-ink-muted">{t("trees.createIntro")}</p>

@@ -63,7 +63,7 @@ export default async function TreePage({ params, searchParams }: PageProps<"/tre
                   (p.isLiving === false ? t("tree.deceased") : "");
               return (
                 <li key={p.id} className="flex flex-col gap-1 border-b border-rule py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                  <span className="font-serif text-2xl">{p.fullName}</span>
+                  <span className="font-display text-2xl">{p.fullName}</span>
                   {details && <span className="text-sm text-ink-muted">{details}</span>}
                 </li>
               );
