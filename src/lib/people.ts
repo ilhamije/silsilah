@@ -53,7 +53,10 @@ export const EDITABLE_FIELDS = [
   "livingIsManual",
 ] as const;
 
-function derive(fields: Omit<PersonFields, "livingOverride"> & { livingOverride: boolean | null }) {
+/** Stored columns for a person: parsed years, living status and name key derived from the fields. */
+export function personDataFromFields(
+  fields: Omit<PersonFields, "livingOverride"> & { livingOverride: boolean | null },
+) {
   const birthYear = parseYear(fields.birthDate);
   const deathYear = parseYear(fields.deathDate);
   const livingIsManual = fields.livingOverride !== null;
@@ -85,7 +88,7 @@ export async function createPerson(db: Db, userId: string, treeId: string, input
   if (!parsed.success) throw badRequest("invalid_person", parsed.error.issues);
   return db.$transaction(async (tx) => {
     const person = await tx.person.create({
-      data: { treeId, ...derive(parsed.data), updatedById: userId },
+      data: { treeId, ...personDataFromFields(parsed.data), updatedById: userId },
     });
     await logActivity(tx, {
       treeId,
@@ -134,7 +137,7 @@ export async function updatePerson(
       livingOverride: current.livingIsManual ? current.isLiving : null,
       ...stripUndefined(parsed.data),
     };
-    const data = derive(merged);
+    const data = personDataFromFields(merged);
 
     const { count } = await tx.person.updateMany({
       where: { id: personId, version: expectedVersion },

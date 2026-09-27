@@ -1,5 +1,6 @@
 import { createStore, del, get, set, type UseStore } from "idb-keyval";
 import type { ExtractResponse } from "@/lib/extraction/service";
+import type { ReviewDraft } from "@/lib/review/draft";
 
 /*
  * The photographed pages live only in this browser (IndexedDB) until the user
@@ -21,7 +22,15 @@ export type StoredPage = {
   continuedAnyway?: boolean;
 };
 
-export type ImportSession = { treeId: string; pages: StoredPage[]; updatedAt: number };
+export type ImportSession = {
+  treeId: string;
+  pages: StoredPage[];
+  updatedAt: number;
+  /** The review screen's working copy, autosaved on every change. */
+  draft?: ReviewDraft;
+  /** Sent with Confirm so a repeated save is recognised by the server. */
+  importId?: string;
+};
 
 let store: UseStore | null | undefined;
 function getStore(): UseStore | null {

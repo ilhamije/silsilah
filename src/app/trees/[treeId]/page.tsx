@@ -8,8 +8,9 @@ import Link from "next/link";
 import { can } from "@/lib/authz/roles";
 import { buttonClass, Notice, PageHeader } from "@/components/ui";
 
-export default async function TreePage({ params }: PageProps<"/trees/[treeId]">) {
+export default async function TreePage({ params, searchParams }: PageProps<"/trees/[treeId]">) {
   const { treeId } = await params;
+  const imported = Number((await searchParams).imported);
   const user = await requireUserOrRedirect(`/trees/${treeId}`);
   const data = await readTree(db, user.id, treeId).catch((e: unknown) => {
     if (e instanceof HttpError && e.status === 404) notFound();
@@ -32,6 +33,12 @@ export default async function TreePage({ params }: PageProps<"/trees/[treeId]">)
             : undefined
         }
       />
+
+      {imported > 0 && (
+        <div className="mb-10">
+          <Notice role="status">{t("tree.imported", { count: imported })}</Notice>
+        </div>
+      )}
 
       {can(data.role, "image.upload") && (
         <p className="mb-10">

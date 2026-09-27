@@ -20,8 +20,8 @@ Design decisions and the build plan are in [`docs/PROPOSAL.md`](docs/PROPOSAL.md
 |---|---|---|
 | 1 | Auth, data model, permissions, i18n, PWA manifest | **done** |
 | 2 | Photo capture and AI extraction (photos never stored) | **done** |
-| 3 | Review and correction screen, saving | next |
-| 4 | Tree view (touch zoom/pan) and manual editing | |
+| 3 | Review and correction screen, saving | **done** |
+| 4 | Tree view (touch zoom/pan) and manual editing | next |
 | 5 | Merge detection, link-based merge, admin tuning page | |
 | 6 | GEDCOM / JSON export (GEDCOM import if time allows) | |
 | 7 | Sharing UI: invites, members, suggested edits, activity, recently deleted | |
