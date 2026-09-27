@@ -1,0 +1,9 @@
+{
+  "is_family_tree": false,
+  "rejection_reason": "This looks like a shop receipt, not a family tree.",
+  "confidence": 0.97,
+  "language_detected": "id",
+  "people": [],
+  "relationships": [],
+  "unclear_items": []
+}

@@ -18,8 +18,8 @@ questions I need answered before starting phase 1.
 | Hosting | Vercel Hobby | Fluid compute, so AI routes get `maxDuration = 300` (the Hobby maximum; I'll re-check it when the route is built) |
 | DB | Neon Postgres via Vercel Marketplace, Prisma | `DATABASE_URL` (pooled) at runtime, `DATABASE_URL_UNPOOLED` as `directUrl` for migrations |
 | **Local DB** | **Postgres too (Docker or a Neon dev branch), not SQLite** | **Deviation.** The schema uses Postgres enums, `String[]` and `Jsonb`. SQLite would need a second schema that drifts from production. Merge logic is pure TS, so its unit tests need no DB at all. |
-| Images | **Vercel Blob in private mode** | Private Blob has been GA since June 2026. Blobs are stored with `access: 'private'`, and pages never see the pathnames. Images are served by `GET /api/images/[id]`, which checks tree membership and then streams the blob (or 302s to a short-lived signed URL). |
-| Upload path | Browser → our route → Blob | Compressed images are about 0.3–1 MB, under the 4.5 MB function body limit, so this is simpler than client-direct upload and the role check happens in the same place. |
+| Images | **Never stored** (decision 6) | The photo stays in the browser (IndexedDB) for preview and review. It's sent once to `POST /api/trees/[treeId]/extract`, forwarded to the AI in memory, and dropped. No Vercel Blob. |
+| Upload path | Browser → our route → Claude | Compressed images are about 0.3–1 MB, under the 4.5 MB function body limit. The route checks the role, sniffs the file type from its bytes, and enforces a per-user daily limit. |
 | Auth | Auth.js v5, Prisma adapter, **magic link via Resend** | No passwords to store or reset. Resend also sends the invites. Credentials login can come later if you want it. |
 | AI | Anthropic SDK, server only, `ANTHROPIC_MODEL` env, **default `claude-sonnet-5`** | Tool-use/structured output forces the JSON shape, Zod still validates it, and one retry on failure. |
 | Tree view | **`family-chart`** (d3-based) | `react-d3-tree` only draws strict hierarchies, so it can't show two parents plus spouses. `family-chart` handles spouses and multiple parents, and d3-zoom gives pinch/pan. If it fights us on touch, I'll fall back to a custom SVG with `d3-zoom`. |
@@ -59,7 +59,7 @@ silsilah/
 │  │  │  └─ trees/[treeId]/
 │  │  │     ├─ page.tsx                        # tree view
 │  │  │     ├─ upload/                         # capture/choose, preview, crop/rotate
-│  │  │     ├─ review/[draftId]/               # review & correct before save
+│  │  │     ├─ review/                         # review & correct before save
 │  │  │     ├─ people/[personId]/              # detail/edit, suggested edits
 │  │  │     ├─ merges/ merges/[suggestionId]/  # side-by-side merge UI
 │  │  │     ├─ deleted/                        # recently deleted (30 days)
@@ -72,9 +72,8 @@ silsilah/
 │  │     ├─ auth/[...nextauth]/
 │  │     ├─ trees/[treeId]/…                   # people, relationships, members, invites,
 │  │     │                                      # suggested-edits, activity, export
-│  │     ├─ images/[imageId]/                  # authenticated image stream
-│  │     ├─ extract/[imageId]/                 # one image per request, maxDuration 300
-│  │     ├─ drafts/[draftId]/confirm/          # the only place extraction → Person rows
+│  │     ├─ trees/[treeId]/extract/            # one page per request, maxDuration 300
+│  │     ├─ trees/[treeId]/import/             # confirm: the only place extraction → Person rows
 │  │     ├─ merges/[id]/{accept,reject,undo}/
 │  │     └─ cron/daily/
 │  ├─ lib/
@@ -86,7 +85,6 @@ silsilah/
 │  │  │  ├─ schema.ts      # Zod schema = single source of truth for the JSON
 │  │  │  ├─ extract.ts     # call, validate, retry once, map API errors
 │  │  │  └─ combine-pages.ts
-│  │  ├─ storage/blob.ts
 │  │  ├─ tree/             # graph helpers, living inference, optimistic-lock helpers
 │  │  ├─ merge/
 │  │  │  ├─ config.ts      # ALL thresholds live here
@@ -101,7 +99,7 @@ silsilah/
 │  │  ├─ gedcom/{export,import}.ts
 │  │  └─ email/resend.ts
 │  ├─ components/          # ui/, capture/, review/, tree/, merge/
-│  └─ client/image/        # exif fix, resize, heic convert (browser only)
+│  └─ client/              # image prep (EXIF, resize, HEIC, rotate, crop) + local page store
 ├─ tests/
 │  ├─ unit/                # normalize, similarity, merge rule, permissions, redaction
 │  └─ integration/         # upload → extract (mocked) → review → confirm
@@ -123,10 +121,10 @@ it is the source of truth. In short:
 
 | Area | Models |
 |---|---|
-| Auth.js | `User` (+ `isAdmin`, `locale`, `deleteOriginalsAfterConfirm`), `Account`, `Session`, `VerificationToken` |
+| Auth.js | `User` (+ `locale`, `deleteOriginalsAfterConfirm`; super admins come from the `ADMIN_EMAILS` env var, not the DB), `Account`, `Session`, `VerificationToken` |
 | Trees & sharing | `FamilyTree` (privacy + cross-family settings, `structureVersion`), `TreeMember` (role), `Invitation` (hashed token, single/multi-use, expiry, revoke) |
 | Family data | `Person` (verbatim partial dates + parsed years, `isLiving`/`livingIsManual`, `nameKey`, `version`, `deletedAt`), `Relationship` (`PARENT_CHILD` / `SPOUSE`, `version`, `deletedAt`) |
-| Extraction | `SourceImage` (private blob pathname, extraction JSON), `ImportDraft` (review state), `RejectionLog` (no image data) |
+| Extraction | `SourcePage` (confirmed page's extraction JSON, for provenance), `ExtractionLog` (outcome, counts and tokens per attempt, no names or images). No image storage. |
 | Merging | `MergeSuggestion`, `MergeOutcome` (tuning analytics), `PersonLink` (accepted matches), `MergeOperation` (history + undo), `ConnectionRequest` |
 | Collaboration | `SuggestedEdit`, `ActivityLog` |
 
@@ -157,127 +155,59 @@ Key mechanics:
 
 ## 4. Extraction
 
-Flow: the upload stores one `SourceImage` per page under an `ImportDraft`. The
-client then calls `POST /api/extract/[imageId]` **once per page, in sequence**.
-Each call sends only that page's image, plus a text list of the people already
-found on earlier pages, so the model can reuse their `temp_id`s. After the last
-page, `combine-pages.ts` merges the results:
+**Photos are never stored** (decision 6). The flow:
 
-1. Drop duplicate `temp_id`s.
-2. Run the name matcher from the merge module across pages.
-3. Any leftover likely-duplicates show in the review screen as "Same person?"
-   prompts instead of being merged silently.
+1. The browser prepares each photo: HEIC → JPEG, EXIF orientation applied, at
+   most 2000px on the long edge, JPEG 80%. It keeps the photos in IndexedDB,
+   so they survive a reload, and they never leave the device otherwise.
+2. The user can rotate, crop, replace, reorder or remove pages.
+3. "Read these pages" sends the pages **one request per page, in order**, to
+   `POST /api/trees/[treeId]/extract` (`maxDuration = 300`). Each request
+   carries that page's image plus KNOWN_PEOPLE, a text list of the people the
+   earlier pages found, so the model can reuse their ids.
+4. The server checks the Editor role and the daily limit, sends the image to
+   Claude, validates the answer, logs the outcome (`ExtractionLog`: counts
+   only, no names, no image) and returns the result. The image is dropped.
+5. New person ids are prefixed with a stable per-photo key, so ids stay
+   unique even if pages are later reordered or removed. `combinePages()`
+   merges the pages in the browser: a person seen twice is merged, gaps are
+   filled from the more confident reading, and different ids with the same
+   name are flagged as "possibly the same person" rather than merged.
+6. The review screen (phase 3) shows the local photo next to the data. On
+   confirm, only the structured data is saved: people, relationships, and one
+   `SourcePage` per page holding the extraction JSON as provenance. The local
+   photos are then deleted.
 
-Images are never re-sent once extracted.
+**Schema extension (a deviation, flagged):** each person also has `bbox`
+(`[x, y, w, h]`, fractions of the image, approximate), for highlighting where a
+name came from. `field_confidence` is a fixed object with one key per field,
+rather than an open map, because structured outputs require fixed keys.
+Everything else matches your schema.
 
-**Small schema extension (a deviation, flagged):** each person gets optional
-`page_index` and `bbox` (`[x, y, w, h]`, normalized 0–1, approximate). This
-makes the "highlight where this name came from" feature possible. Everything
-else matches your schema exactly.
+**Prompt:** the system prompt and the per-page message are in
+[`src/lib/ai/prompt.ts`](../src/lib/ai/prompt.ts). The system prompt is frozen,
+so it can be prompt-cached. The per-page message adds the page number,
+KNOWN_PEOPLE, and the user's UI language for rejection reasons and "unclear"
+notes.
 
-### System prompt (draft)
+**Call handling** (`src/lib/ai/extract.ts`)
 
-```text
-You transcribe photographs of handwritten family trees (genealogies, silsilah,
-nasab, stamboom, árbol genealógico, etc.) into structured data for a family
-archive. Accuracy matters more than completeness: the family will correct your
-output, but they may not notice invented data.
-
-Return your answer by calling the `record_extraction` tool exactly once. Do not
-write any other text.
-
-STEP 1 — Is this a family tree?
-Set is_family_tree = true only if the image shows people AND at least some
-family relationships between them, conveyed by drawing (lines, branches,
-brackets, arrows), layout (generational rows, indentation, nested lists), or
-explicit wording ("anak dari", "son of", "bin/binti", "m.", "=", "x").
-- Photos of people, receipts, landscapes, screenshots, forms, and ordinary
-  documents are NOT family trees. Set is_family_tree = false, give a short,
-  kind rejection_reason in plain language, leave people/relationships empty.
-- A list of names with NO visible relationships, or an image too blurry to
-  read: set is_family_tree = true, confidence ≤ 0.4, extract what you can, and
-  explain the problem in unclear_items. The app will ask the user what to do.
-
-STEP 2 — People
-- One entry per distinct person drawn on the page. temp_id: "p1", "p2", … in
-  reading order, unless the person matches someone in KNOWN_PEOPLE (provided
-  in the user message), in which case reuse that temp_id.
-- full_name: exactly as written, including honorifics and titles (H., Hj.,
-  Raden, Dr., Tuan, Datuk…), in the original script's romanization as written.
-  Do not correct spelling. Do not translate.
-- given_name / family_name: fill ONLY when the naming convention clearly has
-  them. Many people have a single name (e.g. "Sutarno"); patronymic names
-  ("Ahmad bin Yusuf", "Siti binti Hasan", "Ivan Petrovich") are not given +
-  family names — put the whole name in full_name and leave family_name null
-  unless a clan/marga/surname is clearly present (e.g. "Tobing" in Batak names).
-- nicknames: names in parentheses, quotes, or introduced by "alias", "als.",
-  "a.k.a.", "dipanggil", "panggilan".
-- gender: from explicit markers (♂/♀, "Bpk/Ibu", "bin/binti", "son/daughter",
-  squares/circles in a chart with a legend, gendered titles like Hj./Haji).
-  Given-name guesses only if very common and unambiguous in that culture;
-  otherwise "unknown". Record the confidence of your guess in field_confidence.gender.
-- Dates: copy as written, keeping partial and approximate forms ("1952",
-  "~1950", "ca. 1890", "Mei 1931"). Normalize only obvious digit forms
-  ("12-5-31" stays "12-5-31"; do not guess the century). Death markers: "†",
-  "d.", "wafat", "alm.", "almh.", "(late)", a cross or a crossed-out name —
-  if a person is marked deceased without a date, set death_date null and
-  add "marked as deceased" to notes.
-- birth_place, notes: only what is written. Notes may hold occupation,
-  residence, marriage order ("istri ke-2"), or annotations.
-- field_confidence: a 0–1 score for each field you filled (full_name, gender,
-  birth_date, death_date, birth_place, and any others). Below 0.7 means
-  "a human should check this".
-- illegible: true if you cannot read the name reliably; put your best partial
-  reading in full_name with "?" for unreadable letters (e.g. "Su?arni").
-- page_index: the page number given in the user message. bbox: the
-  approximate box around the name, [x, y, width, height] as fractions of the
-  image size. Omit bbox if unsure.
-
-STEP 3 — Relationships
-- parent_child: from_temp_id = parent, to_temp_id = child. If a line comes
-  down from a couple, create a parent_child link from EACH parent to the child.
-- spouse: "m.", "=", "x", "∞", "menikah dengan", "istri/suami", a horizontal
-  line joining two people at the same level. Multiple spouses are allowed.
-- Siblings are expressed only through shared parents; do not add a sibling
-  type. If siblings appear with no parent drawn, do not invent a parent —
-  describe the grouping in unclear_items.
-- Read structure from layout: vertical/branching lines, brackets grouping
-  children, arrows, indentation in nested lists, generation rows.
-- Every relationship gets a confidence. Do not include a relationship you
-  are only guessing at below 0.3 — describe it in unclear_items instead.
-
-NEVER invent people, names, dates, places, or relationships that are not on
-the page. Crossed-out text is ignored unless the correction is also unclear.
-Anything you could not interpret goes in unclear_items as a short description
-a family member can act on, e.g. "Name under the coffee stain, left of
-Aminah, unreadable" or "Unclear whether Rudi is Aminah's son or grandson".
-
-confidence (overall): how complete and reliable the whole extraction is.
-language_detected: BCP-47 code of the handwriting, e.g. "id", "ms", "jv", "en",
-"nl"; use "und" if unknown, or the main one if mixed.
-```
-
-### Per-page user message
-
-```text
-Page {n} of {total} of the same family tree.
-KNOWN_PEOPLE (from earlier pages; reuse their temp_id if the same person appears here):
-[{"temp_id":"p3","full_name":"H. Hasan bin Umar","birth_date":"1921"}, …]
-<image>
-```
-
-### Call handling
-
-- Tool schema is generated from the Zod schema, so there is one source of truth.
-- Zod validation fails → one retry with the validation errors appended.
-- 429 / 529 / timeout → exponential backoff (2 attempts), then a clear message
-  with a Retry button.
-- The UI shows per-page progress ("Reading page 2 of 3…") using a stepped
-  progress indicator driven by per-page requests.
-- `is_family_tree=false` → rejected card with the reason and an example of a
-  good upload. `confidence < 0.5` or no relationships → borderline warning
-  ("Retake" / "Continue and enter manually"). Both cases write a
-  `RejectionLog` row with no image data.
+- The model is `claude-sonnet-5` by default. The answer is constrained with
+  structured outputs (`messages.parse` + `zodOutputFormat`), using the same
+  Zod schema that validates it again on our side.
+- Invalid output, or an answer cut off at `max_tokens`, gets one retry. A
+  refusal is reported without retrying.
+- The SDK retries temporary errors once (429, 5xx/529, connection problems),
+  with a 120-second timeout. The browser then retries a retryable failure
+  once more after 5 seconds and shows "The reading service is busy…" meanwhile.
+  After that, a clear message and a "Try again" button appear.
+- Each page gets a verdict. `is_family_tree = false` means **rejected**: the
+  model's reason plus a hint about what a valid photo looks like.
+  Confidence < 0.5, no relationships, or mostly illegible means **borderline**:
+  "Retake photo" or "Continue and fill in by hand". The thresholds are in
+  `src/lib/ai/classify.ts`.
+- For local development without a key, `EXTRACTION_MOCK=1` returns the
+  fixtures. It is ignored on Vercel production.
 
 ---
 
@@ -413,3 +343,7 @@ The sharing *data model* goes in with phase 1, as you asked.
 4. **UI in English and Bahasa Indonesia**, English first, language toggle at
    the top of every page.
 5. **Magic-link sign-in only** (Auth.js + Resend).
+6. **Photos are never stored.** The AI reads each photo once, and only the
+   confirmed data is kept. The photo stays on the user's device until the
+   review is confirmed. There's no Vercel Blob. The trade-off: a review must
+   be finished on the same device.

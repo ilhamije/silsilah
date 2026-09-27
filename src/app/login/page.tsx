@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { auth, signIn } from "@/auth";
-import { Button, Input } from "@/components/ui";
+import { Button, Field, Input, Notice, PageHeader } from "@/components/ui";
 import { safeRedirect } from "@/lib/safe-redirect";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
@@ -23,22 +23,32 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-4 pt-4">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
-      {callbackUrl.startsWith("/invite/") && <p className="rounded-xl bg-brand-soft p-3">{t("inviteHint")}</p>}
-      <p className="text-muted">{t("intro")}</p>
-      {params.error && (
-        <p role="alert" className="rounded-xl bg-warn-soft p-3 text-warn">
-          {t("error")}
-        </p>
-      )}
-      <form action={sendLink} className="flex flex-col gap-3">
-        <label htmlFor="email" className="font-medium">
-          {t("email")}
-        </label>
-        <Input id="email" name="email" type="email" required autoComplete="email" inputMode="email" autoFocus />
-        <Button type="submit">{t("submit")}</Button>
-      </form>
+    <div className="mx-auto flex max-w-xl flex-col">
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} lede={t("intro")} />
+      <div className="flex flex-col gap-6 border-t border-rule pt-10">
+        {callbackUrl.startsWith("/invite/") && <Notice>{t("inviteHint")}</Notice>}
+        {params.error && (
+          <Notice tone="notice" role="alert">
+            {t("error")}
+          </Notice>
+        )}
+        <form action={sendLink} className="flex flex-col gap-6">
+          <Field id="email" label={t("email")} hint={t("emailHint")}>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              inputMode="email"
+              aria-describedby="email-hint"
+            />
+          </Field>
+          <Button type="submit" className="self-start">
+            {t("submit")}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

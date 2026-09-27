@@ -79,15 +79,10 @@ export async function updateTreeSettings(
 }
 
 /**
- * Permanent. Cascades to people, relationships, images and logs. The caller
- * must delete the returned blob pathnames from storage.
+ * Permanent. Cascades to people, relationships, source pages and the activity
+ * log. No photos are stored anywhere, so there is nothing else to clean up.
  */
 export async function deleteTree(db: Db, userId: string, treeId: string) {
   await assertTreePermission(db, userId, treeId, "tree.delete");
-  const images = await db.sourceImage.findMany({
-    where: { treeId, blobPathname: { not: null } },
-    select: { blobPathname: true },
-  });
   await db.familyTree.delete({ where: { id: treeId } });
-  return images.map((i) => i.blobPathname!);
 }

@@ -4,7 +4,9 @@ import { db } from "@/lib/db";
 import { requireUserOrRedirect } from "@/lib/authz/session";
 import { HttpError } from "@/lib/errors";
 import { readTree } from "@/lib/tree/read";
-import { Card } from "@/components/ui";
+import Link from "next/link";
+import { can } from "@/lib/authz/roles";
+import { buttonClass, Notice, PageHeader } from "@/components/ui";
 
 export default async function TreePage({ params }: PageProps<"/trees/[treeId]">) {
   const { treeId } = await params;
@@ -17,42 +19,48 @@ export default async function TreePage({ params }: PageProps<"/trees/[treeId]">)
   const editor = data.lastEditor && data.lastEditor.id !== user.id ? data.lastEditor : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold">{data.tree.name}</h1>
-        <p className="text-sm text-muted">
-          {t(`roles.${data.role}`)}
-          {editor &&
-            ` · ${t("tree.updatedBy", {
-              name: editor.name ?? editor.email,
-              when: format.relativeTime(data.tree.updatedAt),
-            })}`}
+    <div className="flex flex-col">
+      <PageHeader
+        eyebrow={t(`roles.${data.role}`)}
+        title={data.tree.name}
+        lede={
+          editor
+            ? t("tree.updatedBy", {
+                name: editor.name ?? editor.email,
+                when: format.relativeTime(data.tree.updatedAt),
+              })
+            : undefined
+        }
+      />
+
+      {can(data.role, "image.upload") && (
+        <p className="mb-10">
+          <Link href={`/trees/${treeId}/upload`} className={buttonClass("primary")}>
+            {t("tree.addFromPhoto")}
+          </Link>
         </p>
-      </div>
+      )}
 
-      <p className="rounded-xl bg-brand-soft p-3 text-sm">{t("tree.comingSoon")}</p>
+      <Notice>{t("tree.comingSoon")}</Notice>
 
-      <section aria-labelledby="people-heading" className="flex flex-col gap-2">
-        <h2 id="people-heading" className="text-lg font-semibold">
-          {t("tree.people")}
-        </h2>
+      <section aria-labelledby="people-heading" className="mt-14 flex flex-col gap-6">
+        <h2 id="people-heading">{t("tree.people")}</h2>
         {data.people.length === 0 ? (
-          <p className="text-muted">{t("tree.noPeople")}</p>
+          <p className="measure border-t border-rule pt-6 text-ink-muted">{t("tree.noPeople")}</p>
         ) : (
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {data.people.map((p) => (
-              <li key={p.id}>
-                <Card className="flex flex-col gap-0.5">
-                  <span className="font-medium">{p.fullName}</span>
-                  <span className="text-sm text-muted">
-                    {p.redacted
-                      ? t("tree.hidden")
-                      : [p.birthDate, p.deathDate && `† ${p.deathDate}`, p.birthPlace].filter(Boolean).join(" · ") ||
-                        (p.isLiving === false ? t("tree.deceased") : "")}
-                  </span>
-                </Card>
-              </li>
-            ))}
+          <ul className="flex flex-col border-t border-rule">
+            {data.people.map((p) => {
+              const details = p.redacted
+                ? t("tree.hidden")
+                : [p.birthDate, p.deathDate && `† ${p.deathDate}`, p.birthPlace].filter(Boolean).join(" · ") ||
+                  (p.isLiving === false ? t("tree.deceased") : "");
+              return (
+                <li key={p.id} className="flex flex-col gap-1 border-b border-rule py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                  <span className="font-serif text-2xl">{p.fullName}</span>
+                  {details && <span className="text-sm text-ink-muted">{details}</span>}
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

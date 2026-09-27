@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { sans, serif } from "./fonts";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,28 +17,31 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// Light, paper-toned interface only: no dark theme by design.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
-    { media: "(prefers-color-scheme: dark)", color: "#12110f" },
-  ],
+  themeColor: "#fbfbfa",
+  colorScheme: "light",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("nav")]);
   return (
-    <html lang={locale} className="h-full antialiased">
-      <body className="flex min-h-full flex-col font-sans">
+    <html lang={locale} className={`${serif.variable} ${sans.variable} h-full`}>
+      <body className="flex min-h-full flex-col">
         <NextIntlClientProvider>
-          <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:p-3">
+          <a
+            href="#main"
+            className="sr-only bg-accent px-4 py-3 text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
+          >
             {t("skipToContent")}
           </a>
           <SiteHeader />
-          <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
+          <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-5 pb-20 pt-10 sm:px-8 sm:pt-16">
             {children}
           </main>
+          <SiteFooter />
         </NextIntlClientProvider>
       </body>
     </html>
