@@ -40,7 +40,9 @@
     "error": "Something went wrong signing you in. Please try again.",
     "inviteHint": "Sign in or create an account to join the family tree you were invited to.",
     "eyebrow": "Welcome",
-    "emailHint": "We'll email you a link. There is no password to remember."
+    "emailHint": "We'll email you a link. There is no password to remember.",
+    "errorEmail": "We couldn't send the sign-in email just now. Please try again in a few minutes. If it keeps happening, the site's email settings need attention.",
+    "errorExpired": "That sign-in link has expired or was already used. Enter your email again for a new one."
   },
   "trees": {
     "title": "My trees",

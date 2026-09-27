@@ -14,12 +14,18 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     "use server";
     // redirect: false, then redirect ourselves: letting Auth.js redirect a
     // server action into /api/auth/verify-request stalls the client router.
-    await signIn("resend", {
+    const next = await signIn("resend", {
       email: String(formData.get("email") ?? "").trim().toLowerCase(),
       redirectTo: callbackUrl,
       redirect: false,
     });
-    redirect("/login/check-email");
+    // On failure Auth.js returns its error page URL instead of throwing. This
+    // form only sends a sign-in email, so any error means the email didn't go
+    // out; only say "check your email" when it did. (The reason is in the
+    // server log, prefixed "[email]".)
+    const failed = new URL(String(next), "http://local").searchParams.has("error");
+    const back = callbackUrl === "/trees" ? "" : `&callbackUrl=${encodeURIComponent(callbackUrl)}`;
+    redirect(failed ? `/login?error=email${back}` : "/login/check-email");
   }
 
   return (
@@ -29,7 +35,11 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         {callbackUrl.startsWith("/invite/") && <Notice>{t("inviteHint")}</Notice>}
         {params.error && (
           <Notice tone="notice" role="alert">
-            {t("error")}
+            {params.error === "email"
+              ? t("errorEmail")
+              : params.error === "Verification"
+                ? t("errorExpired")
+                : t("error")}
           </Notice>
         )}
         <form action={sendLink} className="flex flex-col gap-6">
