@@ -9,14 +9,24 @@
     "signIn": "Masuk",
     "language": "Bahasa",
     "skipToContent": "Langsung ke konten",
-    "admin": "Admin"
+    "admin": "Admin",
+    "main": "Utama"
   },
   "home": {
-    "cta": "Mulai",
-    "step1": "Foto silsilah keluarga tulisan tangan",
-    "step2": "Periksa hasil bacaan kami dan perbaiki kesalahannya",
-    "step3": "Bagikan dengan kerabat Anda",
-    "privacy": "Silsilah Anda bersifat pribadi kecuali Anda mengundang seseorang."
+    "cta": "Mulai arsip keluarga Anda",
+    "step1": "Gunakan kamera ponsel atau pilih foto yang sudah ada. Silsilah yang terdiri dari beberapa halaman juga bisa.",
+    "step2": "Setiap nama, tanggal, dan hubungan ditampilkan di samping aslinya. Bagian yang kami ragukan ditandai agar Anda pastikan.",
+    "step3": "Undang kerabat untuk melihat atau membantu melengkapi silsilah. Anda yang menentukan siapa yang boleh mengubahnya.",
+    "privacy": "Sejarah keluarga Anda tetap pribadi, kecuali Anda memilih untuk membagikannya.",
+    "eyebrow": "Arsip keluarga",
+    "headline": "Setiap keluarga punya kisah",
+    "headlineEm": "yang layak dijaga.",
+    "lede": "Foto silsilah yang dulu ditulis tangan oleh kakek-nenek Anda. Silsilah membaca nama dan hubungannya, membiarkan Anda memeriksa setiap detail, dan menyimpannya dengan aman untuk dibagikan kepada kerabat yang masih ingat.",
+    "caption": "Keluarga Hasan, ditulis pada 1972",
+    "howTitle": "Cara kerjanya",
+    "step1Title": "Foto halamannya",
+    "step2Title": "Periksa hasil bacaan kami",
+    "step3Title": "Bagikan dengan keluarga"
   },
   "login": {
     "title": "Masuk",
@@ -28,19 +38,23 @@
     "checkSpam": "Tidak menemukannya? Periksa folder spam, atau kembali dan coba lagi.",
     "back": "Kembali",
     "error": "Terjadi kesalahan saat masuk. Silakan coba lagi.",
-    "inviteHint": "Masuk untuk bergabung dengan silsilah yang mengundang Anda."
+    "inviteHint": "Masuk untuk bergabung dengan silsilah yang mengundang Anda.",
+    "eyebrow": "Selamat datang",
+    "emailHint": "Kami akan mengirim tautan lewat email. Tidak ada kata sandi yang perlu diingat."
   },
   "trees": {
     "title": "Silsilah saya",
     "empty": "Anda belum punya silsilah keluarga.",
     "create": "Silsilah baru",
     "nameLabel": "Nama silsilah",
-    "namePlaceholder": "mis. Keluarga Hasan",
     "createSubmit": "Buat silsilah",
     "cancel": "Batal",
     "people": "{count, plural, =0 {Belum ada orang} other {# orang}}",
     "members": "{count, plural, =1 {Hanya Anda} other {# anggota}}",
-    "updated": "Diperbarui {date}"
+    "updated": "Diperbarui {date}",
+    "eyebrow": "Arsip Anda",
+    "createIntro": "Mulai dengan sebuah nama. Anda bisa menambahkan orang dengan memotret silsilah tulisan tangan atau mengetiknya.",
+    "nameHint": "Misalnya, “Keluarga Hasan” atau “Keluarga Wiryo”."
   },
   "roles": {
     "OWNER": "Pemilik",
@@ -58,18 +72,21 @@
   },
   "invite": {
     "title": "Anda diundang",
-    "body": "Anda diundang bergabung dengan “{tree}” sebagai {role}.",
+    "body": "Anda diundang ke silsilah keluarga ini sebagai {role}.",
     "accept": "Gabung",
     "signInFirst": "Masuk untuk bergabung",
     "expired": "Undangan ini sudah kedaluwarsa. Minta undangan baru kepada pengirimnya.",
     "revoked": "Undangan ini telah dibatalkan.",
     "used": "Undangan ini sudah digunakan.",
     "not_found": "Tautan undangan ini tidak valid.",
-    "email_mismatch": "Undangan ini dikirim ke alamat email lain. Masuk dengan alamat tersebut untuk menerimanya."
+    "email_mismatch": "Undangan ini dikirim ke alamat email lain. Masuk dengan alamat tersebut untuk menerimanya.",
+    "eyebrow": "Undangan",
+    "titleLead": "Bergabung dengan"
   },
   "errors": {
     "generic": "Terjadi kesalahan. Silakan coba lagi.",
-    "notFound": "Halaman tidak ditemukan, atau Anda tidak punya akses."
+    "notFound": "Halaman tidak ditemukan, atau Anda tidak punya akses.",
+    "notFoundTitle": "Halaman tidak ditemukan"
   },
   "admin": {
     "title": "Admin",
@@ -81,6 +98,10 @@
     "rejections30d": "Unggahan ditolak (30 hari)",
     "admins": "Admin",
     "howToChange": "Admin diatur lewat variabel lingkungan ADMIN_EMAILS. Ubah di Vercel lalu deploy ulang.",
-    "comingSoon": "Statistik penyesuaian saran penggabungan hadir di tahap 5."
+    "comingSoon": "Statistik penyesuaian saran penggabungan hadir di tahap 5.",
+    "eyebrow": "Administrasi"
+  },
+  "footer": {
+    "privacy": "Silsilah menjaga kerahasiaan silsilah keluarga. Hanya orang yang Anda undang yang bisa melihatnya, dan Anda dapat menghapusnya beserta semua fotonya kapan saja."
   }
 }

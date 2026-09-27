@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { requireAdminOrRedirect } from "@/lib/authz/session";
 import { parseAdminEmails } from "@/lib/authz/admin";
 import { getAdminStats } from "@/lib/admin-stats";
-import { Card } from "@/components/ui";
+import { Notice, PageHeader } from "@/components/ui";
 
 export const metadata = { title: "Admin" };
 
@@ -21,29 +21,30 @@ export default async function AdminPage() {
   ] as const;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-muted">{t("privacyNote")}</p>
-      </div>
-      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <div className="flex flex-col">
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} lede={t("privacyNote")} />
+      <dl className="grid grid-cols-2 border-t border-rule sm:grid-cols-3">
         {stats.map(([label, value]) => (
-          <Card key={label}>
-            <dt className="text-sm text-muted">{label}</dt>
-            <dd className="text-2xl font-bold tabular-nums">{value}</dd>
-          </Card>
+          <div key={label} className="flex flex-col gap-1 border-b border-rule py-6 pr-4">
+            <dt className="text-sm text-ink-muted">{label}</dt>
+            <dd className="font-serif text-[2.75rem] leading-none tabular-nums">{value}</dd>
+          </div>
         ))}
       </dl>
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">{t("admins")}</h2>
-        <ul className="text-sm">
+      <section className="mt-14 flex flex-col gap-4">
+        <h2>{t("admins")}</h2>
+        <ul className="flex flex-col border-t border-rule">
           {[...parseAdminEmails(process.env.ADMIN_EMAILS)].map((email) => (
-            <li key={email}>{email}</li>
+            <li key={email} className="border-b border-rule py-3">
+              {email}
+            </li>
           ))}
         </ul>
-        <p className="text-sm text-muted">{t("howToChange")}</p>
+        <p className="measure text-sm text-ink-muted">{t("howToChange")}</p>
       </section>
-      <p className="rounded-xl bg-brand-soft p-3 text-sm">{t("comingSoon")}</p>
+      <div className="mt-12">
+        <Notice>{t("comingSoon")}</Notice>
+      </div>
     </div>
   );
 }

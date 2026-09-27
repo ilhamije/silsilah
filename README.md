@@ -52,6 +52,31 @@ Another option is a free Neon branch; put its URLs in `.env`.
 **Signing in locally:** leave `RESEND_API_KEY` empty. The magic link is then
 printed in the terminal running `npm run dev`. Open that link in the browser.
 
+## Design system
+
+The look is archival and editorial, made for readers aged 40 and over. The
+tokens live in `src/app/globals.css` and the shared components in
+`src/components/ui.tsx`.
+
+| Token | Value | Use |
+|---|---|---|
+| `--paper` | `#FBFBFA` | page background |
+| `--ink` | `#1E2229` | text and borders (15.4:1 on paper) |
+| `--accent` | `#2B4C6F` | every interactive element (8.6:1) |
+| `--rule` | ink at 12% | 1px structural lines |
+
+- **Headings:** Instrument Serif at regular weight; italics for storytelling.
+- **Body, navigation and data:** Plus Jakarta Sans. Both fonts are
+  self-hosted by `next/font`.
+- **Body text:** 18px with a 1.625 line height; running text is capped at
+  `65ch` (the `.measure` class). The type scale is shifted up, so nothing
+  renders below 15px.
+- **Interactive elements** are at least 44px tall. Hover shows a colour change
+  plus an underline, and keyboard focus is a 3px Heritage Blue outline.
+- **No shadows, gradients or dark theme.** Structure comes from 1px rules and
+  white space. `AlbumFrame` (a white mat with photo corners) is the only
+  "object" style, and it's reserved for photographs.
+
 ## Super admins
 
 Admins are set with the `ADMIN_EMAILS` environment variable, a comma-separated

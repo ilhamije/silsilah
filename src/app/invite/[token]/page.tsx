@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { HttpError } from "@/lib/errors";
 import { acceptInvitation, inspectInvitation } from "@/lib/sharing/invitations";
-import { Button, buttonClass, Card } from "@/components/ui";
+import { Button, buttonClass, Notice, PageHeader } from "@/components/ui";
 
 export default async function InvitePage({ params, searchParams }: PageProps<"/invite/[token]">) {
   const { token } = await params;
@@ -14,10 +14,12 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
 
   if (info.state !== "valid") {
     return (
-      <Card className="mx-auto max-w-md">
-        <h1 className="mb-2 text-xl font-bold">{t("invite.title")}</h1>
-        <p role="alert">{t(`invite.${info.state}`)}</p>
-      </Card>
+      <div className="mx-auto flex max-w-xl flex-col">
+        <PageHeader eyebrow={t("invite.eyebrow")} title={t("invite.title")} />
+        <Notice tone="notice" role="alert">
+          {t(`invite.${info.state}`)}
+        </Notice>
+      </div>
     );
   }
 
@@ -37,30 +39,32 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
   }
 
   return (
-    <Card className="mx-auto flex max-w-md flex-col gap-4">
-      <h1 className="text-xl font-bold">{t("invite.title")}</h1>
-      <p>
-        {t("invite.body", {
-          tree: info.invitation.tree.name,
-          role: t(`roles.${info.invitation.role}`),
-        })}
-      </p>
-      {error === "email_mismatch" && (
-        <p role="alert" className="rounded-xl bg-warn-soft p-3 text-warn">
-          {t("invite.email_mismatch")}
-        </p>
-      )}
-      {session ? (
-        <form action={accept}>
-          <Button type="submit" className="w-full">
-            {t("invite.accept")}
-          </Button>
-        </form>
-      ) : (
-        <Link href={`/login?callbackUrl=${encodeURIComponent(`/invite/${token}`)}`} className={buttonClass()}>
-          {t("invite.signInFirst")}
-        </Link>
-      )}
-    </Card>
+    <div className="mx-auto flex max-w-xl flex-col">
+      <PageHeader
+        eyebrow={t("invite.eyebrow")}
+        title={
+          <>
+            {t("invite.titleLead")} <em className="italic">{info.invitation.tree.name}</em>
+          </>
+        }
+        lede={t("invite.body", { role: t(`roles.${info.invitation.role}`) })}
+      />
+      <div className="flex flex-col gap-6 border-t border-rule pt-10">
+        {error === "email_mismatch" && (
+          <Notice tone="notice" role="alert">
+            {t("invite.email_mismatch")}
+          </Notice>
+        )}
+        {session ? (
+          <form action={accept}>
+            <Button type="submit">{t("invite.accept")}</Button>
+          </form>
+        ) : (
+          <Link href={`/login?callbackUrl=${encodeURIComponent(`/invite/${token}`)}`} className={buttonClass("primary", "self-start")}>
+            {t("invite.signInFirst")}
+          </Link>
+        )}
+      </div>
+    </div>
   );
 }

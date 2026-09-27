@@ -9,14 +9,24 @@
     "signIn": "Sign in",
     "language": "Language",
     "skipToContent": "Skip to content",
-    "admin": "Admin"
+    "admin": "Admin",
+    "main": "Main"
   },
   "home": {
-    "cta": "Get started",
-    "step1": "Photograph a handwritten family tree",
-    "step2": "Check what we read and fix any mistakes",
-    "step3": "Share it with your relatives",
-    "privacy": "Your trees are private unless you invite someone."
+    "cta": "Begin your family archive",
+    "step1": "Use your phone's camera or choose photos you already have. Trees that span several pages are fine.",
+    "step2": "Every name, date and connection is shown next to the original. Anything we're unsure of is marked for you to confirm.",
+    "step3": "Invite relatives to view the tree or help complete it. You decide who can make changes.",
+    "privacy": "Your family's history stays private unless you choose to share it.",
+    "eyebrow": "A family archive",
+    "headline": "Every family has a story",
+    "headlineEm": "worth keeping.",
+    "lede": "Photograph the family tree your grandparents wrote by hand. Silsilah reads the names and connections, lets you check every detail, and keeps it safe to share with the relatives who remember.",
+    "caption": "The Hasan family, as written in 1972",
+    "howTitle": "How it works",
+    "step1Title": "Photograph the page",
+    "step2Title": "Check what we read",
+    "step3Title": "Share it with family"
   },
   "login": {
     "title": "Sign in",
@@ -28,19 +38,23 @@
     "checkSpam": "Can't find it? Check your spam folder, or go back and try again.",
     "back": "Back",
     "error": "Something went wrong signing you in. Please try again.",
-    "inviteHint": "Sign in to join the family tree you were invited to."
+    "inviteHint": "Sign in to join the family tree you were invited to.",
+    "eyebrow": "Welcome",
+    "emailHint": "We'll email you a link. There is no password to remember."
   },
   "trees": {
     "title": "My trees",
     "empty": "You don't have any family trees yet.",
     "create": "New tree",
     "nameLabel": "Tree name",
-    "namePlaceholder": "e.g. Keluarga Hasan",
     "createSubmit": "Create tree",
     "cancel": "Cancel",
     "people": "{count, plural, =0 {No people} =1 {1 person} other {# people}}",
     "members": "{count, plural, =1 {Only you} other {# members}}",
-    "updated": "Updated {date}"
+    "updated": "Updated {date}",
+    "eyebrow": "Your archive",
+    "createIntro": "Start with a name. You can add people by photographing a handwritten tree or by typing them in.",
+    "nameHint": "For example, “Keluarga Hasan” or “The Wiryo family”."
   },
   "roles": {
     "OWNER": "Owner",
@@ -58,18 +72,21 @@
   },
   "invite": {
     "title": "You're invited",
-    "body": "You've been invited to join “{tree}” as {role}.",
+    "body": "You've been invited to this family tree as {role}.",
     "accept": "Join tree",
     "signInFirst": "Sign in to join",
     "expired": "This invitation has expired. Ask the person who sent it for a new one.",
     "revoked": "This invitation was cancelled.",
     "used": "This invitation has already been used.",
     "not_found": "This invitation link isn't valid.",
-    "email_mismatch": "This invitation was sent to a different email address. Sign in with that address to accept it."
+    "email_mismatch": "This invitation was sent to a different email address. Sign in with that address to accept it.",
+    "eyebrow": "Invitation",
+    "titleLead": "Join"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
-    "notFound": "We couldn't find that page, or you don't have access to it."
+    "notFound": "We couldn't find that page, or you don't have access to it.",
+    "notFoundTitle": "This page isn't here"
   },
   "admin": {
     "title": "Admin",
@@ -81,6 +98,10 @@
     "rejections30d": "Rejected uploads (30 days)",
     "admins": "Admins",
     "howToChange": "Admins are set in the ADMIN_EMAILS environment variable. Change it in Vercel and redeploy.",
-    "comingSoon": "Merge-suggestion tuning statistics arrive with phase 5."
+    "comingSoon": "Merge-suggestion tuning statistics arrive with phase 5.",
+    "eyebrow": "Administration"
+  },
+  "footer": {
+    "privacy": "Silsilah keeps family trees private. Only the people you invite can see yours, and you can delete it, with all its photos, at any time."
   }
 }
