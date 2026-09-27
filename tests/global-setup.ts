@@ -14,6 +14,6 @@ export default function setup() {
   }
   execSync("npx prisma migrate deploy", {
     stdio: "inherit",
-    env: { ...process.env, DATABASE_URL: url, DATABASE_URL_UNPOOLED: url },
+    env: { ...process.env, SIL7878_DATABASE_URL: url, SIL7878_DATABASE_URL_UNPOOLED: url },
   });
 }

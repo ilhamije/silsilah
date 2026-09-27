@@ -42,7 +42,7 @@ cp .env.example .env           # then set AUTH_SECRET (npx auth secret)
 createdb silsilah
 createdb silsilah_test
 
-npm run db:migrate             # apply migrations to DATABASE_URL_UNPOOLED
+npm run db:migrate             # apply migrations to SIL7878_DATABASE_URL_UNPOOLED
 npm run dev                    # http://localhost:3000
 ```
 
@@ -147,8 +147,8 @@ truncates its tables. Never point `DATABASE_URL_TEST` at data you care about.
 
 1. Import the repository in Vercel.
 2. **Storage → Marketplace → Neon**: create a database and connect it to the
-   project. This sets `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED`
-   (direct).
+   project with the env var prefix `SIL7878_`. This sets `SIL7878_DATABASE_URL`
+   (pooled) and `SIL7878_DATABASE_URL_UNPOOLED` (direct), which the app reads.
 3. Add the remaining environment variables from `.env.example`:
    - `AUTH_SECRET`
    - `RESEND_API_KEY` and `EMAIL_FROM` (see **Email** below)

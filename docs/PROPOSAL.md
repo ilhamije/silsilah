@@ -16,7 +16,7 @@ questions I need answered before starting phase 1.
 | Framework | Next.js 16 (App Router) + TypeScript, Tailwind v4 | As specified |
 | i18n | `next-intl`, English (default) + Bahasa Indonesia, cookie-based, toggle in the header on every page | No locale in URLs |
 | Hosting | Vercel Hobby | Fluid compute, so AI routes get `maxDuration = 300` (the Hobby maximum; I'll re-check it when the route is built) |
-| DB | Neon Postgres via Vercel Marketplace, Prisma | `DATABASE_URL` (pooled) at runtime, `DATABASE_URL_UNPOOLED` as `directUrl` for migrations |
+| DB | Neon Postgres via Vercel Marketplace, Prisma | `SIL7878_DATABASE_URL` (pooled) at runtime, `SIL7878_DATABASE_URL_UNPOOLED` as `directUrl` for migrations |
 | **Local DB** | **Postgres too (Docker or a Neon dev branch), not SQLite** | **Deviation.** The schema uses Postgres enums, `String[]` and `Jsonb`. SQLite would need a second schema that drifts from production. Merge logic is pure TS, so its unit tests need no DB at all. |
 | Images | **Never stored** (decision 6) | The photo stays in the browser (IndexedDB) for preview and review. It's sent once to `POST /api/trees/[treeId]/extract`, forwarded to the AI in memory, and dropped. No Vercel Blob. |
 | Upload path | Browser → our route → Claude | Compressed images are about 0.3–1 MB, under the 4.5 MB function body limit. The route checks the role, sniffs the file type from its bytes, and enforces a per-user daily limit. |
