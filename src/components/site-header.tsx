@@ -20,6 +20,11 @@ export async function SiteHeader() {
           {t("app.name")}
         </Link>
         <LanguageToggle />
+        {!signedIn && (
+          <Link href="/login" className={navLink}>
+            {t("nav.signIn")}
+          </Link>
+        )}
         {signedIn && (
           <nav aria-label={t("nav.main")} className="flex w-full items-center gap-2 border-t border-rule pt-2 sm:w-auto sm:border-0 sm:pt-0">
             <Link href="/trees" className={navLink}>

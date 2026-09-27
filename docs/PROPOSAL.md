@@ -173,10 +173,20 @@ Key mechanics:
    merges the pages in the browser: a person seen twice is merged, gaps are
    filled from the more confident reading, and different ids with the same
    name are flagged as "possibly the same person" rather than merged.
-6. The review screen (phase 3) shows the local photo next to the data. On
-   confirm, only the structured data is saved: people, relationships, and one
-   `SourcePage` per page holding the extraction JSON as provenance. The local
-   photos are then deleted.
+6. The review screen shows the local photo next to the data (side by side on
+   wide screens, a Details/Photo switch on phones), with the selected person's
+   name outlined on the photo. Uncertain fields and links are amber until
+   edited or marked "Looks right". Users can edit any field, add or remove
+   people and connections, swap parent and child, combine two entries
+   ("same person"), and link an entry to someone already in the tree. "Same
+   person?" is only suggested for matching names whose birth years are at
+   most 5 years apart. The draft autosaves on the device. Saving is blocked
+   while someone would be their own ancestor or have more than two parents,
+   and the server checks the same rules again, including existing links.
+7. **Save** posts to `POST /api/trees/[treeId]/import`. That call creates the
+   people, relationships and one `SourcePage` per page in a single
+   transaction. It is idempotent via an `importId`, so a double tap saves
+   once. The local photos and draft are then deleted.
 
 **Schema extension (a deviation, flagged):** each person also has `bbox`
 (`[x, y, w, h]`, fractions of the image, approximate), for highlighting where a
