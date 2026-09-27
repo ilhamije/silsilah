@@ -65,7 +65,7 @@
     "members": "{count, plural, =1 {Only you} other {# members}}",
     "updated": "Updated {date}",
     "eyebrow": "Your archive",
-    "createIntro": "Start with a name. You can add people by photographing a handwritten tree or by typing them in.",
+    "createIntro": "Give it a name and choose how to start: an empty tree you fill from photos or by hand, or a ready-made family shape you fill in with real names.",
     "nameHint": "For example, “Keluarga Hasan” or “The Wiryo family”."
   },
   "roles": {
@@ -254,7 +254,7 @@
     "personB": "Other person",
     "add": "Add connection",
     "preview": "Tree preview",
-    "previewHint": "A simple outline of how everyone connects. The full chart comes next.",
+    "previewHint": "How everyone connects, one row per generation. Wide families scroll sideways.",
     "unplaced": "Not connected to anyone yet",
     "notesFromReading": "Notes from reading the photo",
     "pageShort": "p. {n}",
@@ -276,6 +276,74 @@
     "rebuilt": "The pages changed since you last reviewed, so this review was rebuilt from the latest reading.",
     "nothing": "There's nothing to review yet.",
     "addPages": "Add pages",
-    "backToPages": "Back to the photos"
+    "backToPages": "Back to the photos",
+    "previewShape": "Chart shape",
+    "previewPyramid": "Pyramid",
+    "previewInverted": "Upside down"
+  },
+  "templates": {
+    "legend": "Start with",
+    "blank": {
+      "title": "An empty tree",
+      "hint": "Add people from photos of a handwritten tree, or type them in."
+    },
+    "options": {
+      "scratch": {
+        "title": "Start from scratch",
+        "hint": "Begin with yourself, then add each person and connect them one by one."
+      },
+      "parents-children": {
+        "title": "Parents and children",
+        "hint": "5 people: a couple and their three children."
+      },
+      "grandparents": {
+        "title": "Me and my grandparents",
+        "hint": "7 people: you, your parents and all four grandparents."
+      },
+      "descendants": {
+        "title": "A couple's descendants",
+        "hint": "10 people: grandparents, their children and grandchildren, like a family reunion tree."
+      },
+      "nasab": {
+        "title": "Father's line",
+        "hint": "5 generations, from you back to your great-great-grandfather, as in a nasab."
+      },
+      "two-marriages": {
+        "title": "Two marriages",
+        "hint": "7 people: a husband, two wives and the children of each marriage."
+      }
+    },
+    "reviewEyebrow": "Starter tree",
+    "reviewTitle": "Fill in your family",
+    "reviewLede": "Replace each highlighted placeholder with a real name, and add dates if you know them. Remove anyone who doesn't fit, or add more people and connections below. Nothing is saved until you press Save.",
+    "roles": {
+      "me": "Me",
+      "father": "Father",
+      "mother": "Mother",
+      "child1": "First child",
+      "child2": "Second child",
+      "child3": "Third child",
+      "paternalGrandfather": "Grandfather (father's side)",
+      "paternalGrandmother": "Grandmother (father's side)",
+      "maternalGrandfather": "Grandfather (mother's side)",
+      "maternalGrandmother": "Grandmother (mother's side)",
+      "grandfather": "Grandfather",
+      "grandmother": "Grandmother",
+      "child1Spouse": "Spouse of first child",
+      "child2Spouse": "Spouse of second child",
+      "grandchild1a": "Grandchild (first child's)",
+      "grandchild1b": "Second grandchild (first child's)",
+      "grandchild2a": "Grandchild (second child's)",
+      "greatGrandfather": "Great-grandfather",
+      "greatGreatGrandfather": "Great-great-grandfather",
+      "husband": "Husband",
+      "firstWife": "First wife",
+      "secondWife": "Second wife",
+      "firstMarriageChild1": "Child (first marriage)",
+      "firstMarriageChild2": "Second child (first marriage)",
+      "secondMarriageChild1": "Child (second marriage)",
+      "secondMarriageChild2": "Second child (second marriage)"
+    },
+    "scratchLede": "Start by replacing “Me” with your name. Then use “Add a person” and “Add a connection” below to build out your family, with dates and places if you know them. Nothing is saved until you press Save."
   }
 }

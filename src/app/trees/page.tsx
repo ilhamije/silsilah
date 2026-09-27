@@ -3,6 +3,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { requireUserOrRedirect } from "@/lib/authz/session";
 import { listTreesForUser } from "@/lib/trees";
+import { TEMPLATE_IDS } from "@/lib/tree/templates";
 import { Button, Field, Input, PageHeader } from "@/components/ui";
 import { createTreeAction } from "./actions";
 
@@ -56,6 +57,29 @@ export default async function TreesPage() {
           <Field id="name" label={t("trees.nameLabel")} hint={t("trees.nameHint")}>
             <Input id="name" name="name" required maxLength={120} aria-describedby="name-hint" />
           </Field>
+          <fieldset className="flex flex-col gap-3">
+            <legend className="mb-2 font-semibold">{t("templates.legend")}</legend>
+            {(["", ...TEMPLATE_IDS] as const).map((id) => (
+              <label
+                key={id || "blank"}
+                className="flex cursor-pointer items-start gap-4 rounded-field border-3 border-ink bg-mat px-4 py-3 has-[:checked]:bg-accent-tint has-[:checked]:shadow-neo-sm has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ink"
+              >
+                <input
+                  type="radio"
+                  name="template"
+                  value={id}
+                  defaultChecked={id === ""}
+                  className="mt-1 size-6 shrink-0 accent-ink focus-visible:outline-none"
+                />
+                <span className="flex flex-col">
+                  <span className="font-semibold">{id ? t(`templates.options.${id}.title`) : t("templates.blank.title")}</span>
+                  <span className="text-sm text-ink-muted">
+                    {id ? t(`templates.options.${id}.hint`) : t("templates.blank.hint")}
+                  </span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
           <Button type="submit" className="self-start">
             {t("trees.createSubmit")}
           </Button>

@@ -65,7 +65,7 @@
     "members": "{count, plural, =1 {Hanya Anda} other {# anggota}}",
     "updated": "Diperbarui {date}",
     "eyebrow": "Arsip Anda",
-    "createIntro": "Mulai dengan sebuah nama. Anda bisa menambahkan orang dengan memotret silsilah tulisan tangan atau mengetiknya.",
+    "createIntro": "Beri nama, lalu pilih cara memulai: silsilah kosong yang diisi dari foto atau diketik, atau bentuk keluarga siap pakai yang tinggal diisi nama sebenarnya.",
     "nameHint": "Misalnya, “Keluarga Hasan” atau “Keluarga Wiryo”."
   },
   "roles": {
@@ -254,7 +254,7 @@
     "personB": "Orang lain",
     "add": "Tambah hubungan",
     "preview": "Pratinjau silsilah",
-    "previewHint": "Garis besar sederhana tentang hubungan setiap orang. Bagan lengkap hadir berikutnya.",
+    "previewHint": "Cara semua orang terhubung, satu baris per generasi. Keluarga besar bisa digeser ke samping.",
     "unplaced": "Belum terhubung dengan siapa pun",
     "notesFromReading": "Catatan dari pembacaan foto",
     "pageShort": "hlm. {n}",
@@ -276,6 +276,74 @@
     "rebuilt": "Halaman berubah sejak pemeriksaan terakhir, jadi pemeriksaan ini dibuat ulang dari bacaan terbaru.",
     "nothing": "Belum ada yang perlu diperiksa.",
     "addPages": "Tambah halaman",
-    "backToPages": "Kembali ke foto"
+    "backToPages": "Kembali ke foto",
+    "previewShape": "Bentuk bagan",
+    "previewPyramid": "Piramida",
+    "previewInverted": "Terbalik"
+  },
+  "templates": {
+    "legend": "Mulai dengan",
+    "blank": {
+      "title": "Silsilah kosong",
+      "hint": "Tambahkan orang dari foto silsilah tulisan tangan, atau ketik sendiri."
+    },
+    "options": {
+      "scratch": {
+        "title": "Mulai dari awal",
+        "hint": "Mulai dari diri Anda, lalu tambahkan dan hubungkan setiap orang satu per satu."
+      },
+      "parents-children": {
+        "title": "Orang tua dan anak",
+        "hint": "5 orang: pasangan suami istri dan tiga anak mereka."
+      },
+      "grandparents": {
+        "title": "Saya dan kakek-nenek",
+        "hint": "7 orang: Anda, orang tua Anda, dan keempat kakek-nenek."
+      },
+      "descendants": {
+        "title": "Keturunan sepasang kakek-nenek",
+        "hint": "10 orang: kakek-nenek, anak-anak, dan cucu mereka, seperti silsilah keluarga besar (bani)."
+      },
+      "nasab": {
+        "title": "Garis ayah (nasab)",
+        "hint": "5 generasi, dari Anda sampai canggah dari pihak ayah."
+      },
+      "two-marriages": {
+        "title": "Dua pernikahan",
+        "hint": "7 orang: seorang suami, dua istri, dan anak-anak dari tiap pernikahan."
+      }
+    },
+    "reviewEyebrow": "Silsilah awal",
+    "reviewTitle": "Isi silsilah keluarga Anda",
+    "reviewLede": "Ganti setiap nama contoh yang ditandai dengan nama sebenarnya, dan tambahkan tanggal bila Anda tahu. Hapus yang tidak sesuai, atau tambahkan orang dan hubungan lain di bawah. Belum ada yang disimpan sampai Anda menekan Simpan.",
+    "roles": {
+      "me": "Saya",
+      "father": "Ayah",
+      "mother": "Ibu",
+      "child1": "Anak pertama",
+      "child2": "Anak kedua",
+      "child3": "Anak ketiga",
+      "paternalGrandfather": "Kakek (dari ayah)",
+      "paternalGrandmother": "Nenek (dari ayah)",
+      "maternalGrandfather": "Kakek (dari ibu)",
+      "maternalGrandmother": "Nenek (dari ibu)",
+      "grandfather": "Kakek",
+      "grandmother": "Nenek",
+      "child1Spouse": "Pasangan anak pertama",
+      "child2Spouse": "Pasangan anak kedua",
+      "grandchild1a": "Cucu (dari anak pertama)",
+      "grandchild1b": "Cucu kedua (dari anak pertama)",
+      "grandchild2a": "Cucu (dari anak kedua)",
+      "greatGrandfather": "Buyut",
+      "greatGreatGrandfather": "Canggah",
+      "husband": "Suami",
+      "firstWife": "Istri pertama",
+      "secondWife": "Istri kedua",
+      "firstMarriageChild1": "Anak (pernikahan pertama)",
+      "firstMarriageChild2": "Anak kedua (pernikahan pertama)",
+      "secondMarriageChild1": "Anak (pernikahan kedua)",
+      "secondMarriageChild2": "Anak kedua (pernikahan kedua)"
+    },
+    "scratchLede": "Mulailah dengan mengganti “Saya” dengan nama Anda. Lalu gunakan “Tambah orang” dan “Tambah hubungan” di bawah untuk melengkapi keluarga Anda, beserta tanggal dan tempat bila Anda tahu. Belum ada yang disimpan sampai Anda menekan Simpan."
   }
 }

@@ -16,6 +16,7 @@ import {
   type ReviewDraft,
 } from "@/lib/review/draft";
 import type { Edge } from "@/lib/tree/graph";
+import { TEMPLATE_BASIS_PREFIX, templateDraft, type TemplateId } from "@/lib/tree/templates";
 import { Button, buttonClass, Notice } from "@/components/ui";
 import { Attention } from "./attention";
 import { Connections } from "./connections";
@@ -28,9 +29,13 @@ type Props = {
   treeName: string;
   existingPeople: ExistingPerson[];
   existingEdges: Edge[];
+  /** Start from this template when there are no photographed pages. */
+  template?: TemplateId | null;
 };
 
 export type ApplyDraft = (change: (d: ReviewDraft) => ReviewDraft) => void;
+
+const isTemplateDraft = (d: ReviewDraft | null | undefined) => !!d?.basis.startsWith(TEMPLATE_BASIS_PREFIX);
 
 const makeImportId = () => `imp_${crypto.randomUUID().replace(/-/g, "")}`;
 
@@ -42,8 +47,9 @@ function basisOf(session: ImportSession) {
     .join(",");
 }
 
-export function ReviewWorkspace({ treeId, treeName, existingPeople, existingEdges }: Props) {
+export function ReviewWorkspace({ treeId, treeName, existingPeople, existingEdges, template = null }: Props) {
   const t = useTranslations("review");
+  const tTemplates = useTranslations("templates");
   const router = useRouter();
   const [session, setSession] = useState<ImportSession | null>(null);
   const [draft, setDraft] = useState<ReviewDraft | null>(null);
@@ -67,12 +73,19 @@ export function ReviewWorkspace({ treeId, treeName, existingPeople, existingEdge
         setRebuilt(!!s.draft);
         next = { ...s, draft: buildDraft(combinePages(accepted), basis), importId: makeImportId() };
         void saveSession(next);
+      } else if (!basis && template && !isTemplateDraft(s.draft)) {
+        next = {
+          ...s,
+          draft: templateDraft(template, (role) => tTemplates(`roles.${role}`)),
+          importId: makeImportId(),
+        };
+        void saveSession(next);
       }
       sessionRef.current = next;
       setSession(next);
-      setDraft(basis ? (next.draft ?? null) : null);
+      setDraft(basis || isTemplateDraft(next.draft) ? (next.draft ?? null) : null);
     });
-  }, [treeId]);
+  }, [treeId, template, tTemplates]);
 
   /** Every edit goes through here: update state, then autosave shortly after. */
   const apply: ApplyDraft = useCallback((change) => {
@@ -151,37 +164,45 @@ export function ReviewWorkspace({ treeId, treeName, existingPeople, existingEdge
 
   const nameOf = (id: string) => draft.people.find((p) => p.id === id)?.fullName || t("newPersonName");
   const saveCount = draft.people.length;
+  // A template draft has no photos: no photo panel, no switch, one column.
+  const hasPhotos = !isTemplateDraft(draft);
 
   return (
     <div className="flex flex-col gap-10">
-      <p className="-mt-4">
-        <Link href={`/trees/${treeId}/upload`}>← {t("backToPages")}</Link>
-      </p>
+      {hasPhotos && (
+        <p className="-mt-4">
+          <Link href={`/trees/${treeId}/upload`}>← {t("backToPages")}</Link>
+        </p>
+      )}
       {rebuilt && <Notice>{t("rebuilt")}</Notice>}
 
       {/* On phones: switch between the data and the photo. Side by side from lg up. */}
-      <div className="sticky top-0 z-10 -mx-5 border-b border-rule bg-paper px-5 py-2 sm:-mx-8 sm:px-8 lg:hidden">
-        <div role="group" aria-label={t("viewLabel")} className="inline-flex overflow-hidden rounded-full border-3 border-ink shadow-neo-sm">
-          {(["details", "photo"] as const).map((v) => (
-            <button
-              key={v}
-              type="button"
-              aria-pressed={view === v}
-              onClick={() => setView(v)}
-              className={`min-h-11 min-w-28 cursor-pointer px-4 font-semibold ${view === v ? "bg-accent text-paper" : "text-accent hover:bg-accent-tint"}`}
-            >
-              {v === "details" ? t("viewDetails") : t("viewPhoto")}
-            </button>
-          ))}
+      {hasPhotos && (
+        <div className="sticky top-0 z-10 -mx-5 border-b border-rule bg-paper px-5 py-2 sm:-mx-8 sm:px-8 lg:hidden">
+          <div role="group" aria-label={t("viewLabel")} className="inline-flex overflow-hidden rounded-full border-3 border-ink shadow-neo-sm">
+            {(["details", "photo"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={view === v}
+                onClick={() => setView(v)}
+                className={`min-h-11 min-w-28 cursor-pointer px-4 font-semibold ${view === v ? "bg-accent text-paper" : "text-accent hover:bg-accent-tint"}`}
+              >
+                {v === "details" ? t("viewDetails") : t("viewPhoto")}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start">
-        <div className={`${view === "photo" ? "block" : "hidden"} lg:sticky lg:top-6 lg:block`}>
-          <PhotoPanel key={focusId ?? "none"} pages={session.pages} draft={draft} focusId={focusId} />
-        </div>
+      <div className={`grid grid-cols-1 gap-12 ${hasPhotos ? "lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start" : "max-w-3xl"}`}>
+        {hasPhotos && (
+          <div className={`${view === "photo" ? "block" : "hidden"} lg:sticky lg:top-6 lg:block`}>
+            <PhotoPanel key={focusId ?? "none"} pages={session.pages} draft={draft} focusId={focusId} />
+          </div>
+        )}
 
-        <div className={`${view === "details" ? "flex" : "hidden"} flex-col gap-16 lg:flex`}>
+        <div className={`${view === "details" || !hasPhotos ? "flex" : "hidden"} min-w-0 flex-col gap-16 lg:flex`}>
           <Attention
             draft={draft}
             apply={apply}
