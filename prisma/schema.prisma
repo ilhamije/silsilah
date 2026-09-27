@@ -28,20 +28,11 @@ enum RelType {
   SPOUSE
 }
 
-enum ImageStatus {
-  UPLOADED
-  EXTRACTING
-  EXTRACTED
+enum ExtractionOutcome {
+  OK
   REJECTED
   BORDERLINE
   FAILED
-  CONFIRMED
-}
-
-enum DraftStatus {
-  OPEN
-  CONFIRMED
-  DISCARDED
 }
 
 enum SuggestionStatus {
@@ -74,15 +65,14 @@ enum EditStatus {
 // ─── Auth.js ──────────────────────────────────────────────────────────────
 
 model User {
-  id                          String    @id @default(cuid())
-  name                        String?
-  email                       String    @unique
-  emailVerified               DateTime?
-  image                       String?
-  locale                      String?
-  deleteOriginalsAfterConfirm Boolean   @default(false)
-  createdAt                   DateTime  @default(now())
-  updatedAt                   DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  locale        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   accounts           Account[]
   sessions           Session[]
@@ -90,6 +80,7 @@ model User {
   invitationsCreated Invitation[]    @relation("InvitationCreatedBy")
   activity           ActivityLog[]
   suggestedEdits     SuggestedEdit[] @relation("SuggestedEditSubmitter")
+  extractionLogs     ExtractionLog[]
 }
 
 model Account {
@@ -149,8 +140,8 @@ model FamilyTree {
   invitations    Invitation[]
   people         Person[]
   relationships  Relationship[]
-  images         SourceImage[]
-  drafts         ImportDraft[]
+  sourcePages    SourcePage[]
+  extractionLogs ExtractionLog[]
   suggestedEdits SuggestedEdit[]
   activity       ActivityLog[]
   suggestionsA   MergeSuggestion[]   @relation("SuggestionTreeA")
@@ -212,7 +203,7 @@ model Person {
   // null = unknown; treated as living for privacy.
   isLiving       Boolean?
   livingIsManual Boolean   @default(false)
-  sourceImageId  String?
+  sourcePageId   String?
   sourceBox      Json? // {page, x, y, w, h}, normalized 0..1, approximate
   nameKey        String    @default("") // normalized name key for cross-tree lookup
   version        Int       @default(1)
@@ -222,7 +213,7 @@ model Person {
   updatedById    String?
 
   tree           FamilyTree      @relation(fields: [treeId], references: [id], onDelete: Cascade)
-  sourceImage    SourceImage?    @relation(fields: [sourceImageId], references: [id], onDelete: SetNull)
+  sourcePage     SourcePage?     @relation(fields: [sourcePageId], references: [id], onDelete: SetNull)
   relsAsA        Relationship[]  @relation("RelPersonA")
   relsAsB        Relationship[]  @relation("RelPersonB")
   suggestedEdits SuggestedEdit[]
@@ -254,53 +245,51 @@ model Relationship {
   @@index([personBId])
 }
 
-// ─── Images and extraction ───────────────────────────────────────────────
+// ─── Extraction ──────────────────────────────────────────────────────────
+//
+// Photos are never stored. The browser keeps the photo locally, sends it once
+// to /api/trees/[treeId]/extract, which forwards it to the AI and discards it.
+// Only the structured result is kept, and only after the user confirms.
 
-model SourceImage {
-  id           String      @id @default(cuid())
+// One photographed page of a confirmed import: the AI's reading of it, kept as
+// provenance for the people it produced ("where did this name come from?").
+model SourcePage {
+  id           String   @id @default(cuid())
   treeId       String
-  draftId      String?
-  pageIndex    Int         @default(0)
-  // Private Vercel Blob pathname. Never sent to the client; null once the
-  // original has been deleted (the extraction JSON is kept).
-  blobPathname String?
-  status       ImageStatus @default(UPLOADED)
-  extraction   Json?
+  pageIndex    Int      @default(0)
+  extraction   Json // validated model output for this page
   model        String?
   uploadedById String?
-  uploadedAt   DateTime    @default(now())
+  createdAt    DateTime @default(now())
 
-  tree   FamilyTree   @relation(fields: [treeId], references: [id], onDelete: Cascade)
-  draft  ImportDraft? @relation(fields: [draftId], references: [id], onDelete: SetNull)
+  tree   FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
   people Person[]
 
   @@index([treeId])
 }
 
-// Review-screen state. Person rows are only created when a draft is confirmed.
-model ImportDraft {
-  id          String      @id @default(cuid())
-  treeId      String
-  status      DraftStatus @default(OPEN)
-  combined    Json? // merged multi-page extraction
-  edited      Json? // the user's edits on the review screen (autosaved)
-  createdById String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+// One row per extraction attempt, for rate limiting, cost tracking and prompt
+// tuning. Never holds image data or extracted names.
+model ExtractionLog {
+  id           String            @id @default(cuid())
+  userId       String?
+  treeId       String?
+  outcome      ExtractionOutcome
+  reason       String? // model's rejection/borderline reason, or our error code
+  confidence   Float?
+  language     String?
+  peopleCount  Int?
+  model        String?
+  inputTokens  Int?
+  outputTokens Int?
+  durationMs   Int?
+  createdAt    DateTime          @default(now())
 
-  tree   FamilyTree    @relation(fields: [treeId], references: [id], onDelete: Cascade)
-  images SourceImage[]
-}
+  user User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tree FamilyTree? @relation(fields: [treeId], references: [id], onDelete: SetNull)
 
-// Rejected or borderline uploads, for prompt tuning. Never holds image data.
-model RejectionLog {
-  id         String   @id @default(cuid())
-  userId     String?
-  kind       String // "rejected" | "borderline" | "user_continued"
-  reason     String?
-  confidence Float
-  language   String?
-  createdAt  DateTime @default(now())
+  @@index([userId, createdAt])
+  @@index([outcome, createdAt])
 }
 
 // ─── Merge suggestions (link-based) ──────────────────────────────────────

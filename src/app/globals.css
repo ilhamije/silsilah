@@ -172,3 +172,30 @@
   .album-frame > .corner.bl { bottom: 8px; left: 8px; border-bottom: 1px solid; border-left: 1px solid; }
   .album-frame > .corner.br { bottom: 8px; right: 8px; border-bottom: 1px solid; border-right: 1px solid; }
 }
+
+/* react-image-crop: larger, Heritage Blue handles that are easy to grab with a thumb. */
+.silsilah-crop .ReactCrop {
+  --rc-drag-handle-size: 18px;
+  --rc-drag-handle-mobile-size: 32px;
+  --rc-drag-handle-bg-colour: var(--accent);
+  --rc-border-color: #ffffff;
+  --rc-focus-color: var(--accent);
+}
+
+/* Determinate progress bar: hairline track, Heritage Blue fill. */
+.silsilah-progress {
+  appearance: none;
+  border: 0;
+  background: var(--accent-tint);
+  accent-color: var(--accent);
+}
+.silsilah-progress::-webkit-progress-bar {
+  background: var(--accent-tint);
+}
+.silsilah-progress::-webkit-progress-value {
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+.silsilah-progress::-moz-progress-bar {
+  background: var(--accent);
+}

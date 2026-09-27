@@ -11,13 +11,13 @@ export const metadata = { title: "Admin" };
 export default async function AdminPage() {
   await requireAdminOrRedirect("/admin");
   const t = await getTranslations("admin");
-  const { users, trees, people, images, rejections30d: rejections } = await getAdminStats(db);
+  const { users, trees, people, extractions30d, rejections30d } = await getAdminStats(db);
   const stats = [
     [t("users"), users],
     [t("trees"), trees],
     [t("people"), people],
-    [t("images"), images],
-    [t("rejections30d"), rejections],
+    [t("extractions30d"), extractions30d],
+    [t("rejections30d"), rejections30d],
   ] as const;
 
   return (

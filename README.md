@@ -8,7 +8,8 @@ when two trees describe the same family.
 - UI in English and Bahasa Indonesia (toggle at the top of every page)
 - Next.js 16 (App Router), TypeScript, Tailwind CSS v4
 - Postgres (Neon) + Prisma 7, Auth.js v5 magic-link sign-in via Resend
-- Vercel Blob (private) for images, Anthropic Claude (`claude-sonnet-5`) for extraction
+- Anthropic Claude (`claude-sonnet-5`) reads the photos. **Photos are never stored**: each is
+  sent once to be read and then discarded, and only the confirmed data is saved
 - Runs on the Vercel Hobby plan
 
 Design decisions and the build plan are in [`docs/PROPOSAL.md`](docs/PROPOSAL.md).
@@ -18,8 +19,8 @@ Design decisions and the build plan are in [`docs/PROPOSAL.md`](docs/PROPOSAL.md
 | Phase | Scope | State |
 |---|---|---|
 | 1 | Auth, data model, permissions, i18n, PWA manifest | **done** |
-| 2 | Image upload and AI extraction | next |
-| 3 | Review and correction screen | |
+| 2 | Photo capture and AI extraction (photos never stored) | **done** |
+| 3 | Review and correction screen, saving | next |
 | 4 | Tree view (touch zoom/pan) and manual editing | |
 | 5 | Merge detection, link-based merge, admin tuning page | |
 | 6 | GEDCOM / JSON export (GEDCOM import if time allows) | |
@@ -48,6 +49,11 @@ npm run dev                    # http://localhost:3000
 If you don't have Postgres installed, you can run it in Docker:
 `docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16`.
 Another option is a free Neon branch; put its URLs in `.env`.
+
+**Reading photos locally without an API key:** keep `EXTRACTION_MOCK=1` in
+`.env`. Every photo is then "read" as the sample tree in `fixtures/`, so you can
+try the whole flow for free. Set `ANTHROPIC_API_KEY` and remove the flag to use
+the real AI.
 
 **Signing in locally:** leave `RESEND_API_KEY` empty. The magic link is then
 printed in the terminal running `npm run dev`. Open that link in the browser.
@@ -122,18 +128,17 @@ truncates its tables. Never point `DATABASE_URL_TEST` at data you care about.
 2. **Storage → Marketplace → Neon**: create a database and connect it to the
    project. This sets `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED`
    (direct).
-3. **Storage → Blob**: create a store with **private** access and connect it.
-   This sets `BLOB_READ_WRITE_TOKEN`. Blob is used from phase 2 on.
-4. Add the remaining environment variables from `.env.example`:
+3. Add the remaining environment variables from `.env.example`:
    - `AUTH_SECRET`
    - `RESEND_API_KEY` and `EMAIL_FROM` (the address must be on a domain
      verified in Resend)
-   - `ANTHROPIC_API_KEY`
+   - `ANTHROPIC_API_KEY` (from console.anthropic.com; set a monthly spend limit there)
+   - optionally `EXTRACTION_DAILY_LIMIT` (pages per user per day, default 60)
    - `CRON_SECRET`
    - `ADMIN_EMAILS`: the two admin email addresses, comma-separated
-5. Set the **Build Command** to `npm run db:deploy && npm run build`, so
+4. Set the **Build Command** to `npm run db:deploy && npm run build`, so
    migrations run on each deploy using the unpooled URL.
-6. Deploy. `vercel.json` sets up one daily cron (`/api/cron/daily`). It
+5. Deploy. `vercel.json` sets up one daily cron (`/api/cron/daily`). It
    permanently removes people deleted more than 30 days ago and cleans up old
    invitations.
 
@@ -153,6 +158,13 @@ docs/PROPOSAL.md     design, data model, extraction prompt, merge rule
 ```
 
 ## Security model (short version)
+
+- **Photos are never stored.** They stay in the browser (IndexedDB) until the
+  review is confirmed. Each one is sent once to
+  `POST /api/trees/[treeId]/extract`, which checks the Editor role, identifies
+  the file type from its bytes, enforces a per-user daily limit, forwards the
+  photo to Claude in memory, and discards it. `ExtractionLog` records outcomes
+  and token counts only: no names, no images.
 
 - All tree access goes through `assertTreePermission` (`src/lib/authz/tree-access.ts`).
   Non-members get a 404, so tree IDs can't be probed.

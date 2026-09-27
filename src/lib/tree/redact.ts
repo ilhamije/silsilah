@@ -7,7 +7,7 @@ export const HIDDEN_LIVING_FIELDS = [
   "birthPlace",
   "notes",
   "sourceBox",
-  "sourceImageId",
+  "sourcePageId",
 ] as const;
 
 type Redactable = { isLiving: boolean | null } & Partial<

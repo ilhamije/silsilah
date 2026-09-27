@@ -4,7 +4,9 @@ import { db } from "@/lib/db";
 import { requireUserOrRedirect } from "@/lib/authz/session";
 import { HttpError } from "@/lib/errors";
 import { readTree } from "@/lib/tree/read";
-import { Notice, PageHeader } from "@/components/ui";
+import Link from "next/link";
+import { can } from "@/lib/authz/roles";
+import { buttonClass, Notice, PageHeader } from "@/components/ui";
 
 export default async function TreePage({ params }: PageProps<"/trees/[treeId]">) {
   const { treeId } = await params;
@@ -30,6 +32,14 @@ export default async function TreePage({ params }: PageProps<"/trees/[treeId]">)
             : undefined
         }
       />
+
+      {can(data.role, "image.upload") && (
+        <p className="mb-10">
+          <Link href={`/trees/${treeId}/upload`} className={buttonClass("primary")}>
+            {t("tree.addFromPhoto")}
+          </Link>
+        </p>
+      )}
 
       <Notice>{t("tree.comingSoon")}</Notice>
 
