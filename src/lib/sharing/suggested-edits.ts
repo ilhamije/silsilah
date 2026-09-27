@@ -78,3 +78,19 @@ export async function reviewSuggestedEdit(
     return reviewed;
   });
 }
+
+/** Pending suggestions for the review list, newest first. Editors and owners only. */
+export async function listPendingSuggestions(db: Db, userId: string, treeId: string) {
+  await assertTreePermission(db, userId, treeId, "edit.review");
+  return db.suggestedEdit.findMany({
+    where: { treeId, status: "PENDING", person: { deletedAt: null } },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      personId: true,
+      proposedChanges: true,
+      createdAt: true,
+      submittedBy: { select: { name: true, email: true } },
+    },
+  });
+}

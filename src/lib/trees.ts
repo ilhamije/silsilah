@@ -62,7 +62,9 @@ export async function updateTreeSettings(
   input: z.infer<typeof treeSettingsSchema>,
 ) {
   const access = await assertTreePermission(db, userId, treeId, "tree.settings");
-  const data = treeSettingsSchema.parse(input);
+  const parsed = treeSettingsSchema.safeParse(input);
+  if (!parsed.success) throw badRequest("invalid_name", parsed.error.issues);
+  const data = parsed.data;
   return db.$transaction(async (tx) => {
     const updated = await tx.familyTree.update({ where: { id: treeId }, data });
     await logActivity(tx, {

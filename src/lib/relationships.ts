@@ -4,6 +4,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { assertTreePermission } from "@/lib/authz/tree-access";
 import { logActivity, touchTree } from "@/lib/activity";
 import { badRequest, ConflictError, notFound } from "@/lib/errors";
+import { personDataFromFields, personFieldsSchema } from "@/lib/people";
 
 type Tx = Prisma.TransactionClient;
 
@@ -132,4 +133,96 @@ export function liveRelationshipsWhere(treeId: string) {
     personA: { deletedAt: null },
     personB: { deletedAt: null },
   } satisfies Prisma.RelationshipWhereInput;
+}
+
+export const RELATIVE_KINDS = ["parent", "child", "spouse"] as const;
+export type RelativeKind = (typeof RELATIVE_KINDS)[number];
+
+/**
+ * Adds a new person already connected to someone in the tree ("+ Parent",
+ * "+ Child", "+ Spouse" on the chart), in one transaction. A brand-new person
+ * can't create a cycle; the two-parent limit is still checked.
+ *
+ * For a child, `otherParentId` (usually the person's spouse) makes it the
+ * couple's child; without it the child has one parent in the tree, which is
+ * how a step-child of that parent's spouse is recorded.
+ */
+export async function addRelative(
+  db: Db,
+  userId: string,
+  treeId: string,
+  personId: string,
+  kind: unknown,
+  input: unknown,
+  otherParentId: string | null = null,
+) {
+  await assertTreePermission(db, userId, treeId, "person.write");
+  await assertTreePermission(db, userId, treeId, "relationship.write");
+  const parsedKind = z.enum(RELATIVE_KINDS).safeParse(kind);
+  if (!parsedKind.success) throw badRequest("invalid_relative_kind");
+  const parsed = personFieldsSchema.safeParse(input);
+  if (!parsed.success) throw badRequest("invalid_person", parsed.error.issues);
+
+  return db.$transaction(async (tx) => {
+    const anchor = await tx.person.findFirst({ where: { id: personId, treeId, deletedAt: null } });
+    if (!anchor) throw notFound("person_not_found");
+    const otherParent =
+      parsedKind.data === "child" && otherParentId
+        ? await tx.person.findFirst({ where: { id: otherParentId, treeId, deletedAt: null } })
+        : null;
+    if (parsedKind.data === "child" && otherParentId && (!otherParent || otherParent.id === anchor.id)) {
+      throw badRequest("invalid_other_parent");
+    }
+    if (parsedKind.data === "parent") {
+      const parents = await tx.relationship.count({
+        where: { treeId, type: "PARENT_CHILD", personBId: anchor.id, deletedAt: null, personA: { deletedAt: null } },
+      });
+      if (parents >= 2) throw badRequest("too_many_parents");
+    }
+
+    const person = await tx.person.create({
+      data: { treeId, ...personDataFromFields(parsed.data), updatedById: userId },
+    });
+    const [type, personAId, personBId] =
+      parsedKind.data === "parent"
+        ? (["PARENT_CHILD", person.id, anchor.id] as const)
+        : parsedKind.data === "child"
+          ? (["PARENT_CHILD", anchor.id, person.id] as const)
+          : (["SPOUSE", ...[anchor.id, person.id].sort()] as ["SPOUSE", string, string]);
+    const rel = await tx.relationship.create({ data: { treeId, type, personAId, personBId } });
+    const secondRel = otherParent
+      ? await tx.relationship.create({
+          data: { treeId, type: "PARENT_CHILD", personAId: otherParent.id, personBId: person.id },
+        })
+      : null;
+
+    await logActivity(tx, {
+      treeId,
+      userId,
+      action: "created",
+      entityType: "person",
+      entityId: person.id,
+      after: { fullName: person.fullName, gender: person.gender },
+    });
+    await logActivity(tx, {
+      treeId,
+      userId,
+      action: "created",
+      entityType: "relationship",
+      entityId: rel.id,
+      after: { type, personAId, personBId },
+    });
+    if (secondRel) {
+      await logActivity(tx, {
+        treeId,
+        userId,
+        action: "created",
+        entityType: "relationship",
+        entityId: secondRel.id,
+        after: { type: "PARENT_CHILD", personAId: secondRel.personAId, personBId: person.id },
+      });
+    }
+    await touchTree(tx, treeId, userId);
+    return person;
+  });
 }

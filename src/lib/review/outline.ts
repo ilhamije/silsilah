@@ -1,5 +1,3 @@
-import type { ReviewDraft } from "./draft";
-
 export type OutlineNode = { people: string[]; children: OutlineNode[] };
 
 /**
@@ -7,7 +5,10 @@ export type OutlineNode = { people: string[]; children: OutlineNode[] };
  * their spouse(s); their children are nested underneath. Starts from people
  * without parents; anyone not reached is listed separately.
  */
-export function buildOutline(d: Pick<ReviewDraft, "people" | "relationships">) {
+export function buildOutline(d: {
+  people: { id: string }[];
+  relationships: { type: "PARENT_CHILD" | "SPOUSE"; from: string; to: string }[];
+}) {
   const ids = new Set(d.people.map((p) => p.id));
   const spouses = new Map<string, string[]>();
   const children = new Map<string, string[]>();
