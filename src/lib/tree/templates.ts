@@ -1,4 +1,4 @@
-import { newDraftPerson, REVIEW_FIELDS, type ReviewDraft } from "@/lib/review/draft";
+import { newDraftPerson, REVIEW_FIELDS, SELF_REF, type ReviewDraft } from "@/lib/review/draft";
 
 /*
  * Starter trees. "scratch" is the smallest: just the user, to build out from
@@ -190,7 +190,7 @@ export const TEMPLATE_BASIS_PREFIX = "template:";
  */
 export function templateDraft(id: TemplateId, label: (role: Role) => string): ReviewDraft {
   const t = TEMPLATES[id];
-  const pid = (role: Role) => `t_${role}`;
+  const pid = (role: Role) => (role === "me" ? SELF_REF : `t_${role}`);
   return {
     basis: `${TEMPLATE_BASIS_PREFIX}${id}`,
     people: t.people.map(({ role, gender }) => ({

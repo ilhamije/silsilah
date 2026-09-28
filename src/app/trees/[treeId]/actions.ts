@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/authz/session";
 import { ConflictError, HttpError } from "@/lib/errors";
-import { createPerson, restorePerson, softDeletePerson, updatePerson } from "@/lib/people";
+import { createPerson, restorePerson, setSelfPerson, softDeletePerson, updatePerson } from "@/lib/people";
 import { reviewSuggestedEdit, submitSuggestedEdit } from "@/lib/sharing/suggested-edits";
 import type { Person } from "@/generated/prisma/client";
 import { addRelative, createRelationship, deleteRelationship } from "@/lib/relationships";
@@ -87,6 +87,11 @@ export async function addRelativeAction(
   return run((userId) =>
     addRelative(db, userId, str(treeId), str(personId), kind, fields, otherParentId ? str(otherParentId) : null),
   );
+}
+
+/** "This is me" (a person id) or "This isn't me" (null). */
+export async function setSelfAction(treeId: string, personId: string | null) {
+  return run((userId) => setSelfPerson(db, userId, str(treeId), personId ? str(personId) : null));
 }
 
 export async function connectAction(treeId: string, input: unknown) {

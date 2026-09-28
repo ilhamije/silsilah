@@ -79,6 +79,7 @@ export default async function TreePage({ params, searchParams }: PageProps<"/tre
         canEdit={canEdit}
         people={people}
         relationships={data.relationships}
+        selfId={data.selfPersonId}
       />
 
       {suggestions.length > 0 && (

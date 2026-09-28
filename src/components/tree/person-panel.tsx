@@ -7,6 +7,7 @@ import {
   connectAction,
   deletePersonAction,
   disconnectAction,
+  setSelfAction,
   type ActionResult,
 } from "@/app/trees/[treeId]/actions";
 import { Button, Field, Input, Notice } from "@/components/ui";
@@ -19,7 +20,11 @@ type Props = {
   people: TreePerson[];
   relationships: TreeRelationship[];
   canEdit: boolean;
+  /** This person is the viewer ("This is me"). */
+  isSelf: boolean;
   onSelect: (id: string) => void;
+  /** Scroll the chart so this person is in the middle of it. */
+  onCenter: () => void;
   onClose: () => void;
   /** Called after a successful change; the id (or null) says who to show next. */
   onDone: (showId?: string | null) => void;
@@ -32,7 +37,7 @@ const control = "min-h-13 w-full rounded-field border-3 border-rule-strong bg-ma
  * add a relative, see their family, edit details (optimistic locking), and
  * connect someone already in the tree.
  */
-export function PersonPanel({ treeId, person: p, people, relationships, canEdit, onSelect, onClose, onDone }: Props) {
+export function PersonPanel({ treeId, person: p, people, relationships, canEdit, isSelf, onSelect, onCenter, onClose, onDone }: Props) {
   const t = useTranslations("tree");
   const [error, setError] = useState<{ text: string; conflict: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -76,6 +81,17 @@ export function PersonPanel({ treeId, person: p, people, relationships, canEdit,
         </h2>
         <Button type="button" variant="secondary" onClick={onClose}>
           {t("close")}
+        </Button>
+      </div>
+
+      {/* Anyone may say who they are in the tree; it only colours their own chart. */}
+      <div className="-mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+        {isSelf && <span className="rounded-full border-3 border-ink bg-self px-3 py-0.5 text-sm font-semibold">{t("thisIsYou")}</span>}
+        <Button type="button" variant="quiet" disabled={busy} className="min-h-11 text-sm" onClick={() => void act(() => setSelfAction(treeId, isSelf ? null : p.id))}>
+          {isSelf ? t("notMe") : t("thisIsMe")}
+        </Button>
+        <Button type="button" variant="quiet" className="min-h-11 text-sm" onClick={onCenter}>
+          {t("centerOnChart")}
         </Button>
       </div>
 

@@ -130,6 +130,11 @@ export async function importReviewedTree(
         });
       }
 
+      const selfId = payload.selfRef ? idFor.get(payload.selfRef) : undefined;
+      if (selfId) {
+        await tx.treeMember.update({ where: { treeId_userId: { treeId, userId } }, data: { personId: selfId } });
+      }
+
       await logActivity(tx, {
         treeId,
         userId,

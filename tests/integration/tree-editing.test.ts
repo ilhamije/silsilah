@@ -3,7 +3,7 @@ import { describeDb, makeUser, resetDb, testDb } from "../helpers/db";
 import { HttpError } from "@/lib/errors";
 import { createTree, updateTreeSettings } from "@/lib/trees";
 import { listPendingSuggestions, submitSuggestedEdit } from "@/lib/sharing/suggested-edits";
-import { createPerson, softDeletePerson } from "@/lib/people";
+import { createPerson, setSelfPerson, softDeletePerson } from "@/lib/people";
 import { addRelative } from "@/lib/relationships";
 import { readTree } from "@/lib/tree/read";
 
@@ -120,5 +120,32 @@ describeDb("suggestions and renaming", () => {
     expect((await db.familyTree.findUnique({ where: { id: tree.id } }))?.name).toBe("Bani Hasan");
     await expectHttp(updateTreeSettings(db, owner.id, tree.id, { name: "   " }), 400, "invalid_name");
     await expectHttp(updateTreeSettings(db, viewer.id, tree.id, { name: "Mine" }), 403);
+  });
+});
+
+describeDb("This is me", () => {
+  beforeEach(resetDb);
+
+  it("each member marks their own person; it's cleared when that person is deleted", async () => {
+    const { owner, viewer, tree, sari } = await setup();
+    const hasan = await createPerson(db, owner.id, tree.id, { fullName: "Hasan" });
+    await setSelfPerson(db, owner.id, tree.id, sari.id);
+    await setSelfPerson(db, viewer.id, tree.id, hasan.id); // viewers may say who they are
+
+    expect((await readTree(db, owner.id, tree.id)).selfPersonId).toBe(sari.id);
+    expect((await readTree(db, viewer.id, tree.id)).selfPersonId).toBe(hasan.id);
+
+    await softDeletePerson(db, owner.id, tree.id, sari.id, sari.version);
+    expect((await readTree(db, owner.id, tree.id)).selfPersonId).toBeNull();
+
+    await setSelfPerson(db, viewer.id, tree.id, null);
+    expect((await readTree(db, viewer.id, tree.id)).selfPersonId).toBeNull();
+  });
+
+  it("refuses someone from another tree", async () => {
+    const { owner, tree } = await setup();
+    const other = await createTree(db, owner.id, "Other");
+    const stranger = await createPerson(db, owner.id, other.id, { fullName: "Stranger" });
+    await expectHttp(setSelfPerson(db, owner.id, tree.id, stranger.id), 404, "person_not_found");
   });
 });

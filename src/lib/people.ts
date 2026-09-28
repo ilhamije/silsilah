@@ -220,6 +220,20 @@ export async function restorePerson(db: Db, userId: string, treeId: string, pers
   });
 }
 
+/**
+ * "This is me": links the caller's membership to a person in the tree, or
+ * clears it with null. Any member may say who they are, viewers included; it
+ * only changes how their own chart looks.
+ */
+export async function setSelfPerson(db: Db, userId: string, treeId: string, personId: string | null) {
+  await assertTreePermission(db, userId, treeId, "tree.read");
+  if (personId) {
+    const person = await db.person.findFirst({ where: { id: personId, treeId, deletedAt: null } });
+    if (!person) throw notFound("person_not_found");
+  }
+  await db.treeMember.update({ where: { treeId_userId: { treeId, userId } }, data: { personId } });
+}
+
 export async function listRecentlyDeleted(db: Db, userId: string, treeId: string) {
   await assertTreePermission(db, userId, treeId, "person.write");
   return db.person.findMany({

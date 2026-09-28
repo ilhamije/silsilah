@@ -209,6 +209,9 @@ export function confirmPerson(d: ReviewDraft, id: string): ReviewDraft {
   };
 }
 
+/** Draft id of the user themselves: "Me" in a starter tree (see src/lib/tree/templates.ts). */
+export const SELF_REF = "t_me";
+
 export function newDraftPerson(id: string, fullName = ""): DraftPerson {
   return {
     id,
@@ -375,5 +378,6 @@ export function toImportPayload(d: ReviewDraft, pages: PageForImport[], importId
       bbox: p.bbox && p.bbox.length === 4 ? p.bbox : null,
     })),
     relationships: d.relationships.map(({ type, from, to }) => ({ type, from, to })),
+    selfRef: d.people.some((p) => p.id === SELF_REF) ? SELF_REF : null,
   };
 }

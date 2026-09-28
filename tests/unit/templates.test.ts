@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import en from "../../messages/en.json";
 import { importPayloadSchema } from "@/lib/import/schema";
-import { fieldNeedsCheck, personNeedsCheck, toImportPayload, validateDraft } from "@/lib/review/draft";
+import { fieldNeedsCheck, personNeedsCheck, SELF_REF, toImportPayload, validateDraft } from "@/lib/review/draft";
 import { isTemplateId, ROLES, TEMPLATE_IDS, TEMPLATES, templateDraft } from "@/lib/tree/templates";
 
 const label = (role: string) => `Label ${role}`;
@@ -19,6 +19,13 @@ describe("tree templates", () => {
 
     const payload = toImportPayload(draft, [], "imp_templatetest");
     expect(importPayloadSchema.safeParse(payload).success).toBe(true);
+  });
+
+  it("sends the template's Me as the user's own person, and nothing when Me was removed", () => {
+    const draft = templateDraft("grandparents", label);
+    expect(toImportPayload(draft, [], "imp_selftest1").selfRef).toBe(SELF_REF);
+    const withoutMe = { ...draft, people: draft.people.filter((p) => p.id !== SELF_REF), relationships: [] };
+    expect(toImportPayload(withoutMe, [], "imp_selftest2").selfRef).toBeNull();
   });
 
   it("flags every placeholder name for checking, and nothing else", () => {

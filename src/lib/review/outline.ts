@@ -49,6 +49,9 @@ export function buildOutline(d: {
       if (node) roots.push(node);
     }
   }
-  const alone = roots.filter((n) => n.people.length === 1 && n.children.length === 0).map((n) => n.people[0]);
-  return { roots: roots.filter((n) => n.people.length > 1 || n.children.length > 0), alone };
+  // Alone: nobody's spouse and nobody's parent. (A parent whose child is drawn in another branch, beside their
+  // spouse, still belongs on the chart: the line to that child is drawn across.)
+  const isAlone = (n: OutlineNode) => n.people.length === 1 && n.children.length === 0 && !children.has(n.people[0]);
+  const alone = roots.filter(isAlone).map((n) => n.people[0]);
+  return { roots: roots.filter((n) => !isAlone(n)), alone };
 }

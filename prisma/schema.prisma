@@ -157,9 +157,12 @@ model TreeMember {
   userId   String
   role     Role
   joinedAt DateTime @default(now())
+  // Who this member is in the tree ("This is me"); highlighted on their chart.
+  personId String?
 
-  tree FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
-  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tree   FamilyTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  person Person?    @relation(fields: [personId], references: [id], onDelete: SetNull)
 
   @@id([treeId, userId])
   @@index([userId])
@@ -219,6 +222,7 @@ model Person {
   suggestedEdits SuggestedEdit[]
   linksAsA       PersonLink[]    @relation("LinkPersonA")
   linksAsB       PersonLink[]    @relation("LinkPersonB")
+  members        TreeMember[]
 
   @@index([treeId, deletedAt])
   @@index([nameKey])

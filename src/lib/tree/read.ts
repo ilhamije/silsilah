@@ -9,7 +9,7 @@ import { redactPerson } from "./redact";
  */
 export async function readTree(db: Db, userId: string, treeId: string) {
   const access = await assertTreePermission(db, userId, treeId, "tree.read");
-  const [tree, people, relationships] = await Promise.all([
+  const [tree, people, relationships, member] = await Promise.all([
     db.familyTree.findUniqueOrThrow({
       where: { id: treeId },
       select: {
@@ -30,6 +30,7 @@ export async function readTree(db: Db, userId: string, treeId: string) {
       where: liveRelationshipsWhere(treeId),
       select: { id: true, type: true, personAId: true, personBId: true, version: true },
     }),
+    db.treeMember.findUnique({ where: { treeId_userId: { treeId, userId } }, select: { personId: true } }),
   ]);
   const lastEditor = tree.lastEditedById
     ? await db.user.findUnique({
@@ -43,5 +44,7 @@ export async function readTree(db: Db, userId: string, treeId: string) {
     lastEditor,
     people: people.map((p) => redactPerson(p, access.role, tree.hideLivingFromViewers)),
     relationships,
+    /** The caller's own person ("This is me"), if they've said and that person isn't deleted. */
+    selfPersonId: people.some((p) => p.id === member?.personId) ? member!.personId : null,
   };
 }

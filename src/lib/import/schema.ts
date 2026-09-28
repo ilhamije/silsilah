@@ -46,6 +46,8 @@ export const importPayloadSchema = z.object({
       }),
     )
     .max(MAX_IMPORT_PEOPLE * 4),
+  /** The person who is the user ("Me" in a starter tree); becomes their "This is me". */
+  selfRef: z.string().min(1).max(64).nullish(),
 });
 
 export type ImportPayload = z.infer<typeof importPayloadSchema>;

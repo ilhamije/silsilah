@@ -157,7 +157,11 @@
     "updatedMoment": "Updated by {name} a moment ago",
     "recentlyDeleted": "Recently deleted",
     "errorSuggestion": "Change at least one detail to send a suggestion.",
-    "errorOtherParent": "Choose someone else in the tree as the other parent."
+    "errorOtherParent": "Choose someone else in the tree as the other parent.",
+    "thisIsMe": "This is me",
+    "thisIsYou": "That's you",
+    "notMe": "This isn't me",
+    "centerOnChart": "Centre on chart"
   },
   "invite": {
     "title": "You're invited",
@@ -421,7 +425,11 @@
     "shape": "Chart shape",
     "pyramid": "Pyramid",
     "inverted": "Upside down",
-    "unplaced": "Not connected to anyone yet"
+    "unplaced": "Not connected to anyone yet",
+    "zoom": "Zoom",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "zoomReset": "Reset zoom to 100%"
   },
   "deleted": {
     "title": "Recently deleted",

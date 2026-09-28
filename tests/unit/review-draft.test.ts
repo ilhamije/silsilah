@@ -155,4 +155,16 @@ describe("buildOutline", () => {
     expect(roots[0].children[0].children).toHaveLength(2); // Dewi, Arif
     expect(alone).toEqual(["m9"]);
   });
+
+  it("keeps a parent whose child is drawn beside their spouse in another branch on the chart", async () => {
+    const { buildOutline } = await import("@/lib/review/outline");
+    const pc = (from: string, to: string) => ({ type: "PARENT_CHILD" as const, from, to });
+    const { roots, alone } = buildOutline({
+      people: ["hisDad", "husband", "hadijah", "herMum"].map((id) => ({ id })),
+      relationships: [pc("hisDad", "husband"), { type: "SPOUSE", from: "husband", to: "hadijah" }, pc("herMum", "hadijah")],
+    });
+    expect(roots.map((r) => r.people)).toEqual([["hisDad"], ["herMum"]]);
+    expect(roots[0].children[0].people).toEqual(["husband", "hadijah"]);
+    expect(alone).toEqual([]);
+  });
 });

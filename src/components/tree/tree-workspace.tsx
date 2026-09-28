@@ -14,13 +14,16 @@ type Props = {
   people: TreePerson[];
   relationships: TreeRelationship[];
   canEdit: boolean;
+  /** The viewer's own person ("This is me"). */
+  selfId: string | null;
 };
 
 /** The saved tree: the chart, plus a panel for whoever is tapped. */
-export function TreeWorkspace({ treeId, people, relationships, canEdit }: Props) {
+export function TreeWorkspace({ treeId, people, relationships, canEdit, selfId }: Props) {
   const t = useTranslations("tree");
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [centerOn, setCenterOn] = useState<{ id: string } | null>(null);
   const panel = useRef<HTMLDivElement>(null);
 
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
@@ -53,6 +56,8 @@ export function TreeWorkspace({ treeId, people, relationships, canEdit }: Props)
             detailOf={(id) => lifeYears(byId.get(id))}
             onSelect={(id) => setSelectedId(id === selectedId ? null : id)}
             selectedId={selectedId}
+            selfId={selfId}
+            centerOn={centerOn}
           />
         </section>
       )}
@@ -66,7 +71,9 @@ export function TreeWorkspace({ treeId, people, relationships, canEdit }: Props)
             people={people}
             relationships={relationships}
             canEdit={canEdit}
+            isSelf={selected.id === selfId}
             onSelect={setSelectedId}
+            onCenter={() => setCenterOn({ id: selected.id })}
             onClose={() => setSelectedId(null)}
             onDone={done}
           />

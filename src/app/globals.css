@@ -31,6 +31,9 @@
   --notice: #ffe3d1; /* orange wash for "please check" states (ink 17.2:1, muted 5.7:1) */
   --notice-ink: #8a3300; /* (6.7:1 on --notice) */
   --danger: #c4001f; /* (6.2:1) */
+  --married: #ff0000; /* chart: bright red line joining husband and wife (4.0:1) */
+  --lineage: #00a800; /* chart: bright green lines from parents to their children (3.2:1) */
+  --self: #dbeafe; /* chart: pastel blue card for "This is me" (ink 17.2:1, muted 5.7:1) */
 }
 
 /*
@@ -51,6 +54,9 @@
   --notice: #e6cbb8; /* (ink 11.9:1, muted 6.7:1) */
   --notice-ink: #6e2900; /* (6.9:1 on --notice) */
   --danger: #9e0019; /* (5.7:1) */
+  --married: #e00000; /* (3.4:1) */
+  --lineage: #008400; /* (3.3:1) */
+  --self: #b9c9dd; /* (ink 10.9:1, muted 6.2:1) */
 }
 
 @theme inline {
@@ -66,6 +72,9 @@
   --color-notice: var(--notice);
   --color-notice-ink: var(--notice-ink);
   --color-danger: var(--danger);
+  --color-married: var(--married);
+  --color-lineage: var(--lineage);
+  --color-self: var(--self);
   --color-pink: var(--pink);
   --color-yellow: var(--yellow);
   --color-mint: var(--mint);

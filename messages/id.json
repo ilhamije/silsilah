@@ -157,7 +157,11 @@
     "updatedMoment": "Baru saja diperbarui oleh {name}",
     "recentlyDeleted": "Baru dihapus",
     "errorSuggestion": "Ubah setidaknya satu detail untuk mengirim usulan.",
-    "errorOtherParent": "Pilih orang lain di silsilah sebagai orang tua lainnya."
+    "errorOtherParent": "Pilih orang lain di silsilah sebagai orang tua lainnya.",
+    "thisIsMe": "Ini saya",
+    "thisIsYou": "Ini Anda",
+    "notMe": "Bukan saya",
+    "centerOnChart": "Tengahkan di bagan"
   },
   "invite": {
     "title": "Anda diundang",
@@ -421,7 +425,11 @@
     "shape": "Bentuk bagan",
     "pyramid": "Piramida",
     "inverted": "Terbalik",
-    "unplaced": "Belum terhubung dengan siapa pun"
+    "unplaced": "Belum terhubung dengan siapa pun",
+    "zoom": "Perbesaran",
+    "zoomOut": "Perkecil",
+    "zoomIn": "Perbesar",
+    "zoomReset": "Kembalikan ke 100%"
   },
   "deleted": {
     "title": "Baru dihapus",
