@@ -1,0 +1,111 @@
+{
+  "id": "overlap-a",
+  "people": [
+    {
+      "id": "a1",
+      "fullName": "H. Hasan bin Yusuf",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1920
+    },
+    {
+      "id": "a2",
+      "fullName": "Hj. Siti Aminah",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1925
+    },
+    {
+      "id": "a3",
+      "fullName": "Rahmat Hasan",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1950
+    },
+    {
+      "id": "a4",
+      "fullName": "Dewi Lestari",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1953
+    },
+    {
+      "id": "a5",
+      "fullName": "Budi Rahmat",
+      "nicknames": [
+        "Ubud"
+      ],
+      "gender": "MALE",
+      "birthYear": 1978
+    },
+    {
+      "id": "a6",
+      "fullName": "Sari Rahmat",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1981
+    },
+    {
+      "id": "a7",
+      "fullName": "Ahmad Hasan",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1955
+    },
+    {
+      "id": "a8",
+      "fullName": "Nur Hasan",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1983
+    }
+  ],
+  "parentChild": [
+    [
+      "a1",
+      "a3"
+    ],
+    [
+      "a2",
+      "a3"
+    ],
+    [
+      "a1",
+      "a7"
+    ],
+    [
+      "a2",
+      "a7"
+    ],
+    [
+      "a3",
+      "a5"
+    ],
+    [
+      "a4",
+      "a5"
+    ],
+    [
+      "a3",
+      "a6"
+    ],
+    [
+      "a4",
+      "a6"
+    ],
+    [
+      "a7",
+      "a8"
+    ]
+  ],
+  "spouses": [
+    [
+      "a1",
+      "a2"
+    ],
+    [
+      "a3",
+      "a4"
+    ]
+  ]
+}

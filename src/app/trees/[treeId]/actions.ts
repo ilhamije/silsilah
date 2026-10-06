@@ -1,6 +1,8 @@
 "use server";
 
+import { after } from "next/server";
 import { db } from "@/lib/db";
+import { detectMerges } from "@/lib/merge/detect";
 import { requireUser } from "@/lib/authz/session";
 import { ConflictError, HttpError } from "@/lib/errors";
 import { createPerson, restorePerson, setSelfPerson, softDeletePerson, updatePerson } from "@/lib/people";
@@ -24,10 +26,20 @@ export type ConflictPerson = Pick<
 >;
 export type SaveResult = ActionResult | { ok: false; error: "version_conflict"; conflict: true; current: ConflictPerson };
 
-async function run(fn: (userId: string) => Promise<{ id?: string } | void>): Promise<ActionResult> {
+/**
+ * Runs an action as the signed-in user. Pass `detectFor` for edits that change
+ * the shape of a tree: merge detection then runs after the response is sent.
+ */
+async function run(
+  fn: (userId: string) => Promise<{ id?: string } | void>,
+  detectFor?: string,
+): Promise<ActionResult> {
   try {
     const user = await requireUser();
     const out = await fn(user.id);
+    if (detectFor) {
+      after(() => detectMerges(db, detectFor, { userId: user.id }).catch((e) => console.error("merge detection failed", e)));
+    }
     return { ok: true, id: out?.id };
   } catch (e) {
     if (e instanceof HttpError) {
@@ -54,7 +66,7 @@ export async function savePersonAction(
       if (e instanceof ConflictError) current = e.current as Person | null;
       throw e;
     }
-  });
+  }, str(treeId));
   const c = current as Person | null;
   if (!res.ok && res.conflict && c) {
     // Editors only reach this point (updatePerson checks person.write), so no redaction is needed.
@@ -70,11 +82,11 @@ export async function savePersonAction(
 }
 
 export async function deletePersonAction(treeId: string, personId: string, version: number) {
-  return run((userId) => softDeletePerson(db, userId, str(treeId), str(personId), Number(version)));
+  return run((userId) => softDeletePerson(db, userId, str(treeId), str(personId), Number(version)), str(treeId));
 }
 
 export async function addPersonAction(treeId: string, fields: unknown) {
-  return run((userId) => createPerson(db, userId, str(treeId), fields));
+  return run((userId) => createPerson(db, userId, str(treeId), fields), str(treeId));
 }
 
 export async function addRelativeAction(
@@ -84,8 +96,10 @@ export async function addRelativeAction(
   fields: unknown,
   otherParentId: string | null = null,
 ) {
-  return run((userId) =>
-    addRelative(db, userId, str(treeId), str(personId), kind, fields, otherParentId ? str(otherParentId) : null),
+  return run(
+    (userId) =>
+      addRelative(db, userId, str(treeId), str(personId), kind, fields, otherParentId ? str(otherParentId) : null),
+    str(treeId),
   );
 }
 
@@ -95,11 +109,11 @@ export async function setSelfAction(treeId: string, personId: string | null) {
 }
 
 export async function connectAction(treeId: string, input: unknown) {
-  return run((userId) => createRelationship(db, userId, str(treeId), input));
+  return run((userId) => createRelationship(db, userId, str(treeId), input), str(treeId));
 }
 
 export async function disconnectAction(treeId: string, relationshipId: string, version: number) {
-  return run((userId) => deleteRelationship(db, userId, str(treeId), str(relationshipId), Number(version)));
+  return run((userId) => deleteRelationship(db, userId, str(treeId), str(relationshipId), Number(version)), str(treeId));
 }
 
 /** Owners only (the "tree.settings" permission). */

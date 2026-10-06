@@ -12,6 +12,7 @@ import { TreeWorkspace } from "@/components/tree/tree-workspace";
 import type { TreePerson } from "@/components/tree/types";
 import { LiveRefresh } from "@/components/tree/live-refresh";
 import { SuggestionsList } from "@/components/tree/suggestions-list";
+import { listMerges } from "@/lib/merge/read";
 import { listPendingSuggestions } from "@/lib/sharing/suggested-edits";
 
 export default async function TreePage({ params, searchParams }: PageProps<"/trees/[treeId]">) {
@@ -42,6 +43,9 @@ export default async function TreePage({ params, searchParams }: PageProps<"/tre
       redacted: p.redacted,
     }),
   );
+  const matches = can(data.role, "merge.decide")
+    ? (await listMerges(db, user.id, treeId)).filter((m) => m.status !== "ACCEPTED").length
+    : 0;
   const suggestions = can(data.role, "edit.review") ? await listPendingSuggestions(db, user.id, treeId) : [];
 
   return (
@@ -63,6 +67,15 @@ export default async function TreePage({ params, searchParams }: PageProps<"/tre
       {imported > 0 && (
         <div className="mb-10">
           <Notice role="status">{t("tree.imported", { count: imported })}</Notice>
+        </div>
+      )}
+
+      {matches > 0 && (
+        <div className="mb-10">
+          <Notice role="status">
+            {t("merge.bannerCount", { count: matches })}{" "}
+            <Link href={`/trees/${treeId}/merges`}>{t("merge.bannerLink")}</Link>
+          </Notice>
         </div>
       )}
 

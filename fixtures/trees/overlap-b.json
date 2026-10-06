@@ -1,0 +1,79 @@
+{
+  "id": "overlap-b",
+  "people": [
+    {
+      "id": "b1",
+      "fullName": "Haji Hasan",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1921
+    },
+    {
+      "id": "b2",
+      "fullName": "Siti Aminah",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1925
+    },
+    {
+      "id": "b3",
+      "fullName": "Mohammad Ahmad Hasan",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1955
+    },
+    {
+      "id": "b4",
+      "fullName": "Nur Hasanah",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1984
+    },
+    {
+      "id": "b5",
+      "fullName": "Rachmat Hasan",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1950
+    },
+    {
+      "id": "b6",
+      "fullName": "Hendra Wijaya",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1990
+    }
+  ],
+  "parentChild": [
+    [
+      "b1",
+      "b3"
+    ],
+    [
+      "b2",
+      "b3"
+    ],
+    [
+      "b1",
+      "b5"
+    ],
+    [
+      "b2",
+      "b5"
+    ],
+    [
+      "b3",
+      "b4"
+    ],
+    [
+      "b3",
+      "b6"
+    ]
+  ],
+  "spouses": [
+    [
+      "b1",
+      "b2"
+    ]
+  ]
+}

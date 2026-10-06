@@ -1,0 +1,35 @@
+{
+  "id": "decoy-c",
+  "people": [
+    {
+      "id": "c1",
+      "fullName": "Hasan Basri",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1960
+    },
+    {
+      "id": "c2",
+      "fullName": "Siti Aminah",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1990
+    },
+    {
+      "id": "c3",
+      "fullName": "Rahmat Hidayat",
+      "nicknames": [],
+      "gender": "MALE",
+      "birthYear": 1975
+    },
+    {
+      "id": "c4",
+      "fullName": "Dewi Sartika",
+      "nicknames": [],
+      "gender": "FEMALE",
+      "birthYear": 1999
+    }
+  ],
+  "parentChild": [],
+  "spouses": []
+}

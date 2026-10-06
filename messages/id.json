@@ -190,9 +190,24 @@
     "rejections30d": "Halaman ditolak atau kurang jelas (30 hari)",
     "admins": "Admin",
     "howToChange": "Admin diatur lewat variabel lingkungan ADMIN_EMAILS. Ubah di Vercel lalu deploy ulang.",
-    "comingSoon": "Statistik penyesuaian saran penggabungan hadir di tahap 5.",
     "eyebrow": "Administrasi",
-    "extractions30d": "Halaman dibaca (30 hari)"
+    "extractions30d": "Halaman dibaca (30 hari)",
+    "merge": {
+      "mergeTitle": "Saran penggabungan",
+      "mergePending": "Menunggu keputusan",
+      "mergeDecided": "Sudah diputuskan (total)",
+      "mergeByBand": "Disetujui / ditolak menurut kekuatan",
+      "accepted": "disetujui",
+      "rejected": "ditolak",
+      "reviewed": "sebagian disetujui",
+      "undone": "dibatalkan",
+      "noDecisions": "Belum ada keputusan. Setelah orang menyetujui atau menolak saran, angkanya muncul di sini untuk menyetel ambang kecocokan.",
+      "band": {
+        "HIGH": "Kuat",
+        "MEDIUM": "Mungkin",
+        "LOW": "Lemah"
+      }
+    }
   },
   "footer": {
     "privacy": "Silsilah menjaga kerahasiaan silsilah keluarga. Hanya orang yang Anda undang yang bisa melihatnya. Foto hanya dibaca sekali dan tidak pernah disimpan: kami hanya menyimpan nama dan hubungan yang Anda konfirmasi, dan Anda dapat menghapus silsilah kapan saja."
@@ -439,5 +454,65 @@
     "restore": "Pulihkan",
     "restoreLabel": "Pulihkan {name}",
     "goneOn": "dihapus selamanya pada {date}"
+  },
+  "merge": {
+    "eyebrow": "Kemungkinan kecocokan",
+    "title": "Silsilah yang cocok",
+    "lede": "Silsilah-silsilah ini tampaknya memuat sebagian orang yang sama. Tidak ada yang berubah sampai Anda menyetujui, dan Anda bisa membatalkannya kemudian.",
+    "none": "Belum ada kemungkinan kecocokan. Kami memeriksa lagi setiap kali silsilah yang Anda ubah berubah.",
+    "anotherFamily": "Silsilah keluarga lain",
+    "matches": "{count, plural, other {# orang yang cocok}}",
+    "awaitingYou": "menunggu jawaban Anda",
+    "band": {
+      "HIGH": "Cocok sekali",
+      "MEDIUM": "Kemungkinan besar cocok",
+      "LOW": "Mungkin cocok"
+    },
+    "linked": "Orang yang terhubung",
+    "linkedAs": "{mine} adalah orang yang sama dengan {theirs} di {tree}",
+    "unlink": "Putuskan",
+    "viewAccepted": "Lihat kecocokan yang disetujui dengan {name}",
+    "reviewTitle": "{a} dan {b}",
+    "reviewLede": "Centang orang-orang yang memang sama. Kedua silsilah tetap seperti semula; orang yang cocok dihubungkan, dan Anda memilih keterangan mana yang dipakai bila berbeda.",
+    "hiddenRequester": "Ditemukan kemungkinan kecocokan dengan silsilah keluarga lain ({count, plural, other {# orang yang cocok}}). Pemiliknya sudah diminta persetujuan; rinciannya akan terlihat bila mereka setuju.",
+    "hiddenResponder": "Silsilah keluarga lain mungkin memuat sebagian orang yang sama. Hanya orang dari silsilah Anda sendiri yang ditampilkan sampai Anda mengizinkan sambungan ini.",
+    "requestPrompt": "Maukah Anda terhubung dengan silsilah keluarga ini? Dengan mengizinkan, kedua keluarga dapat meninjau kecocokannya. Silsilah Anda tidak berubah karena izin ini.",
+    "allow": "Izinkan",
+    "decline": "Tolak",
+    "kind": {
+      "ancestor": "punya leluhur yang cocok",
+      "descendant": "punya keturunan yang cocok",
+      "direct": "terhubung sebagai orang tua dan anak di kedua silsilah",
+      "spouse": "menikah dengan orang yang cocok"
+    },
+    "conflicts": "Keterangan ini berbeda. Pilih yang dipakai:",
+    "conflictHint": "Biarkan kosong untuk mempertahankan isi masing-masing silsilah.",
+    "field": {
+      "fullName": "Nama",
+      "gender": "Jenis kelamin",
+      "birthDate": "Lahir",
+      "deathDate": "Wafat",
+      "birthPlace": "Tempat lahir",
+      "notes": "Catatan"
+    },
+    "accept": "{count, plural, other {Hubungkan # orang}}",
+    "reject": "Bukan orang yang sama",
+    "accepted": "Terhubung. Anda bisa membatalkannya di bawah.",
+    "rejected": "Baik. Kami tidak akan menyarankan ini lagi kecuali jauh lebih banyak yang cocok.",
+    "alreadyAccepted": "Kecocokan ini sudah disetujui.",
+    "undo": "Batalkan kecocokan ini",
+    "undone": "Dibatalkan. Hubungan dihapus dan keterangan yang berubah dikembalikan.",
+    "backToTree": "Kembali ke silsilah",
+    "bannerCount": "{count, plural, other {# kemungkinan kecocokan dengan silsilah lain}}",
+    "bannerLink": "Tinjau",
+    "error": {
+      "generic": "Terjadi kesalahan. Muat ulang dan coba lagi.",
+      "suggestion_not_found": "Kecocokan ini sudah tidak tersedia.",
+      "suggestion_closed": "Kecocokan ini sudah diputuskan.",
+      "person_changed": "Seseorang mengubah atau menghapus salah satu orang ini. Muat ulang dan coba lagi.",
+      "connection_not_accepted": "Keluarga lain belum setuju untuk terhubung.",
+      "no_field_choices_across_families": "Keterangan tidak dapat diubah antar keluarga.",
+      "already_undone": "Sudah dibatalkan."
+    }
   }
 }

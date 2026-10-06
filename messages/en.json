@@ -190,9 +190,24 @@
     "rejections30d": "Rejected or unclear pages (30 days)",
     "admins": "Admins",
     "howToChange": "Admins are set in the ADMIN_EMAILS environment variable. Change it in Vercel and redeploy.",
-    "comingSoon": "Merge-suggestion tuning statistics arrive with phase 5.",
     "eyebrow": "Administration",
-    "extractions30d": "Pages read (30 days)"
+    "extractions30d": "Pages read (30 days)",
+    "merge": {
+      "mergeTitle": "Merge suggestions",
+      "mergePending": "Waiting for a decision",
+      "mergeDecided": "Decided (all time)",
+      "mergeByBand": "Accepted / rejected by strength",
+      "accepted": "accepted",
+      "rejected": "rejected",
+      "reviewed": "partly accepted",
+      "undone": "undone",
+      "noDecisions": "No decisions yet. Once people accept or reject suggestions, the numbers appear here so the matching thresholds can be tuned.",
+      "band": {
+        "HIGH": "Strong",
+        "MEDIUM": "Likely",
+        "LOW": "Possible"
+      }
+    }
   },
   "footer": {
     "privacy": "Silsilah keeps family trees private. Only the people you invite can see yours. Photos are read once and never stored: we keep only the names and connections you confirm, and you can delete a tree at any time."
@@ -439,5 +454,65 @@
     "restore": "Restore",
     "restoreLabel": "Restore {name}",
     "goneOn": "removed for good on {date}"
+  },
+  "merge": {
+    "eyebrow": "Possible matches",
+    "title": "Matching trees",
+    "lede": "These trees seem to describe some of the same people. Nothing changes until you accept, and you can undo it afterwards.",
+    "none": "No possible matches right now. We check again whenever a tree you edit changes.",
+    "anotherFamily": "Another family's tree",
+    "matches": "{count, plural, =1 {1 matching person} other {# matching people}}",
+    "awaitingYou": "waiting for your answer",
+    "band": {
+      "HIGH": "Strong match",
+      "MEDIUM": "Likely match",
+      "LOW": "Possible match"
+    },
+    "linked": "Linked people",
+    "linkedAs": "{mine} is the same person as {theirs} in {tree}",
+    "unlink": "Unlink",
+    "viewAccepted": "Review the accepted match with {name}",
+    "reviewTitle": "{a} and {b}",
+    "reviewLede": "Tick the people who really are the same. Both trees stay as they are; matched people are linked, and you choose which details to keep where they differ.",
+    "hiddenRequester": "A possible match was found with another family's tree ({count, plural, =1 {1 matching person} other {# matching people}}). Their owners have been asked; you will see the details if they agree.",
+    "hiddenResponder": "Another family's tree may include some of the same people. Only people from your own tree are shown until you allow the connection.",
+    "requestPrompt": "Do you want to connect with this family's tree? Allowing lets both families review the matches. Nothing is changed in your tree by allowing.",
+    "allow": "Allow",
+    "decline": "Decline",
+    "kind": {
+      "ancestor": "share a matching ancestor",
+      "descendant": "share a matching descendant",
+      "direct": "connected as parent and child in both trees",
+      "spouse": "married to matching people"
+    },
+    "conflicts": "These details differ. Pick the one to keep:",
+    "conflictHint": "Leave blank to keep each tree's own value.",
+    "field": {
+      "fullName": "Name",
+      "gender": "Gender",
+      "birthDate": "Born",
+      "deathDate": "Died",
+      "birthPlace": "Birthplace",
+      "notes": "Notes"
+    },
+    "accept": "{count, plural, =1 {Link 1 person} other {Link # people}}",
+    "reject": "Not the same people",
+    "accepted": "Linked. You can undo this below.",
+    "rejected": "Got it. We won't suggest this again unless much more matches.",
+    "alreadyAccepted": "This match was accepted.",
+    "undo": "Undo this match",
+    "undone": "Undone. Links removed and changed details restored.",
+    "backToTree": "Back to the tree",
+    "bannerCount": "{count, plural, =1 {1 possible match with another tree} other {# possible matches with other trees}}",
+    "bannerLink": "Review",
+    "error": {
+      "generic": "Something went wrong. Please reload and try again.",
+      "suggestion_not_found": "This match is no longer available.",
+      "suggestion_closed": "This match was already decided.",
+      "person_changed": "Someone changed or deleted one of these people. Reload and try again.",
+      "connection_not_accepted": "The other family hasn't agreed to connect yet.",
+      "no_field_choices_across_families": "Details can't be changed across families.",
+      "already_undone": "Already undone."
+    }
   }
 }

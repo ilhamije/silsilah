@@ -10,4 +10,12 @@ the tests and by `EXTRACTION_MOCK=1` (local development without an API key).
 | `extraction-rejected.json` | A receipt: `is_family_tree: false` |
 | `extraction-borderline.json` | A list of names with no relationships and low confidence |
 
-The two overlapping trees for merge detection are added in phase 5.
+## trees/
+
+Trees in the shape the merge matcher reads (`MergeTree` in `src/lib/merge/types.ts`). Used by `tests/unit/merge.test.ts` and `npx tsx scripts/tune-merge.ts`.
+
+| File | What it is |
+|---|---|
+| `trees/overlap-a.json` | The 1972 chart: Hasan and Siti, their children Rahmat and Ahmad, and grandchildren |
+| `trees/overlap-b.json` | A cousin's chart of the same family, with different spellings (Haji Hasan, Rachmat, Mohammad Ahmad Hasan, Nur Hasanah). Should match A on 5 people |
+| `trees/decoy-c.json` | Shares names with A but no structure. Should never match |

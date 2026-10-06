@@ -11,7 +11,7 @@ export const metadata = { title: "Admin" };
 export default async function AdminPage() {
   await requireAdminOrRedirect("/admin");
   const t = await getTranslations("admin");
-  const { users, trees, people, extractions30d, rejections30d } = await getAdminStats(db);
+  const { users, trees, people, extractions30d, rejections30d, merges } = await getAdminStats(db);
   const stats = [
     [t("users"), users],
     [t("trees"), trees],
@@ -42,9 +42,37 @@ export default async function AdminPage() {
         </ul>
         <p className="measure text-sm text-ink-muted">{t("howToChange")}</p>
       </section>
-      <div className="mt-12">
-        <Notice>{t("comingSoon")}</Notice>
-      </div>
+      <section className="mt-14 flex flex-col gap-4">
+        <h2>{t("merge.mergeTitle")}</h2>
+        <p className="text-ink-muted">
+          {t("merge.mergePending")}: {merges.pending} · {t("merge.mergeDecided")}: {merges.decided}
+        </p>
+        {merges.outcomes.length === 0 ? (
+          <Notice>{t("merge.noDecisions")}</Notice>
+        ) : (
+          <table className="measure w-full border-t border-rule text-left">
+            <caption className="sr-only">{t("merge.mergeByBand")}</caption>
+            <thead>
+              <tr className="text-sm text-ink-muted">
+                <th className="py-2 font-semibold">{t("merge.mergeByBand")}</th>
+                <th className="py-2 font-semibold">#</th>
+                <th className="py-2 font-semibold">Ø score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {merges.outcomes.map((o) => (
+                <tr key={`${o.band}-${o.outcome}`} className="border-t border-rule">
+                  <td className="py-2">
+                    {t(`merge.band.${o.band}`)} · {t(`merge.${o.outcome as "accepted"}`)}
+                  </td>
+                  <td className="py-2 tabular-nums">{o.count}</td>
+                  <td className="py-2 tabular-nums">{o.avgScore}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
     </div>
   );
 }
