@@ -161,7 +161,10 @@
     "thisIsMe": "This is me",
     "thisIsYou": "That's you",
     "notMe": "This isn't me",
-    "centerOnChart": "Centre on chart"
+    "centerOnChart": "Centre on chart",
+    "download": "Download this tree:",
+    "downloadGedcom": "GEDCOM (for other genealogy apps)",
+    "downloadJson": "JSON (all details)"
   },
   "invite": {
     "title": "You're invited",

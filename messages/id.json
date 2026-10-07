@@ -161,7 +161,10 @@
     "thisIsMe": "Ini saya",
     "thisIsYou": "Ini Anda",
     "notMe": "Bukan saya",
-    "centerOnChart": "Tengahkan di bagan"
+    "centerOnChart": "Tengahkan di bagan",
+    "download": "Unduh silsilah ini:",
+    "downloadGedcom": "GEDCOM (untuk aplikasi silsilah lain)",
+    "downloadJson": "JSON (semua rincian)"
   },
   "invite": {
     "title": "Anda diundang",

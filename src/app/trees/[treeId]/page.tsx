@@ -111,8 +111,18 @@ export default async function TreePage({ params, searchParams }: PageProps<"/tre
         </div>
       )}
 
+      <p className="mt-14 flex flex-wrap gap-x-6 gap-y-2 border-t-3 border-ink pt-6">
+        <span className="text-ink-muted">{t("tree.download")}</span>
+        <a href={`/api/trees/${treeId}/export?format=gedcom`} download>
+          {t("tree.downloadGedcom")}
+        </a>
+        <a href={`/api/trees/${treeId}/export?format=json`} download>
+          {t("tree.downloadJson")}
+        </a>
+      </p>
+
       {canEdit && (
-        <p className="mt-14 border-t-3 border-ink pt-6">
+        <p className="mt-6">
           <Link href={`/trees/${treeId}/deleted`}>{t("tree.recentlyDeleted")}</Link>
         </p>
       )}
