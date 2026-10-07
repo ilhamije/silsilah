@@ -120,6 +120,9 @@ export default async function TreePage({ params, searchParams }: PageProps<"/tre
           {t("tree.downloadJson")}
         </a>
       </p>
+      <p className="mt-6">
+        <Link href={`/trees/${treeId}/settings`}>{t("tree.settingsLink")}</Link>
+      </p>
 
       {canEdit && (
         <p className="mt-6">

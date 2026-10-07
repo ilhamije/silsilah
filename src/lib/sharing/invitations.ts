@@ -146,3 +146,13 @@ export async function acceptInvitation(
     return member;
   });
 }
+
+/** Invitations that can still be used. Never includes the token or its hash. */
+export async function listActiveInvitations(db: Db, userId: string, treeId: string, now = new Date()) {
+  await assertTreePermission(db, userId, treeId, "invite.manage");
+  return db.invitation.findMany({
+    where: { treeId, revokedAt: null, expiresAt: { gt: now } },
+    select: { id: true, email: true, role: true, singleUse: true, useCount: true, expiresAt: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
