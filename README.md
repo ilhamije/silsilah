@@ -156,8 +156,13 @@ truncates its tables. Never point `DATABASE_URL_TEST` at data you care about.
    - optionally `EXTRACTION_DAILY_LIMIT` (pages per user per day, default 60)
    - `CRON_SECRET`
    - `ADMIN_EMAILS`: the two admin email addresses, comma-separated
-4. Set the **Build Command** to `npm run db:deploy && npm run build`, so
-   migrations run on each deploy using the unpooled URL.
+4. Leave the **Build Command** at its default (it runs `npm run build`). That
+   script applies pending migrations first, using the unpooled URL, but only
+   for Production builds. A failed migration fails the build, so the previous
+   deployment stays live. Preview builds skip it because they may share the
+   production database; set `MIGRATE_ON_BUILD=1` on Preview if it has its own
+   database branch. If you ever override the Build Command in the Vercel
+   dashboard, keep `npm run build` in it, or migrations won't run.
 5. Deploy. `vercel.json` sets up one daily cron (`/api/cron/daily`). It
    permanently removes people deleted more than 30 days ago and cleans up old
    invitations.
