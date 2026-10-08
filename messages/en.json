@@ -162,10 +162,12 @@
     "thisIsYou": "That's you",
     "notMe": "This isn't me",
     "centerOnChart": "Centre on chart",
-    "download": "Download this tree:",
-    "downloadGedcom": "GEDCOM (for other genealogy apps)",
-    "downloadJson": "JSON (all details)",
-    "settingsLink": "Sharing and settings"
+    "downloadGedcom": "Download GEDCOM",
+    "downloadJson": "Download JSON",
+    "settingsLink": "Sharing and settings",
+    "moreLabel": "Tree options",
+    "downloadGedcomHint": "For other genealogy apps",
+    "downloadJsonHint": "All details, for backups"
   },
   "invite": {
     "title": "You're invited",

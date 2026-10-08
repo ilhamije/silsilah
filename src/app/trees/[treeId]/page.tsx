@@ -111,24 +111,22 @@ export default async function TreePage({ params, searchParams }: PageProps<"/tre
         </div>
       )}
 
-      <p className="mt-14 flex flex-wrap gap-x-6 gap-y-2 border-t-3 border-ink pt-6">
-        <span className="text-ink-muted">{t("tree.download")}</span>
-        <a href={`/api/trees/${treeId}/export?format=gedcom`} download>
+      <nav aria-label={t("tree.moreLabel")} className="mt-14 flex flex-wrap gap-4 border-t-3 border-ink pt-8">
+        <Link href={`/trees/${treeId}/settings`} className={buttonClass("secondary")}>
+          {t("tree.settingsLink")}
+        </Link>
+        {canEdit && (
+          <Link href={`/trees/${treeId}/deleted`} className={buttonClass("secondary")}>
+            {t("tree.recentlyDeleted")}
+          </Link>
+        )}
+        <a href={`/api/trees/${treeId}/export?format=gedcom`} download title={t("tree.downloadGedcomHint")} className={buttonClass("secondary")}>
           {t("tree.downloadGedcom")}
         </a>
-        <a href={`/api/trees/${treeId}/export?format=json`} download>
+        <a href={`/api/trees/${treeId}/export?format=json`} download title={t("tree.downloadJsonHint")} className={buttonClass("secondary")}>
           {t("tree.downloadJson")}
         </a>
-      </p>
-      <p className="mt-6">
-        <Link href={`/trees/${treeId}/settings`}>{t("tree.settingsLink")}</Link>
-      </p>
-
-      {canEdit && (
-        <p className="mt-6">
-          <Link href={`/trees/${treeId}/deleted`}>{t("tree.recentlyDeleted")}</Link>
-        </p>
-      )}
+      </nav>
 
       <LiveRefresh
         updatedAt={data.tree.updatedAt.toISOString()}

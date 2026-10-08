@@ -21,14 +21,14 @@ Design decisions and the build plan are in [`docs/PROPOSAL.md`](docs/PROPOSAL.md
 | 1 | Auth, data model, permissions, i18n, PWA manifest | **done** |
 | 2 | Photo capture and AI extraction (photos never stored) | **done** |
 | 3 | Review and correction screen, saving | **done** |
-| 4 | Tree view (touch zoom/pan) and manual editing | next |
-| 5 | Merge detection, link-based merge, admin tuning page | |
-| 6 | GEDCOM / JSON export (GEDCOM import if time allows) | |
-| 7 | Sharing UI: invites, members, suggested edits, activity, recently deleted | |
+| 4 | Tree view (touch zoom/pan) and manual editing | **done** |
+| 5 | Merge detection, link-based merge, admin tuning page | **done** |
+| 6 | GEDCOM / JSON export (GEDCOM import if time allows) | **done** (export; import not built) |
+| 7 | Sharing UI: invites, members, suggested edits, activity, recently deleted | **done** |
 
-The sharing and collaboration *logic* (roles, invitations, optimistic locking,
-recently deleted, living-person privacy, suggested edits, activity log) is
-already in `src/lib` and covered by tests. Phase 7 adds the screens for it.
+The sharing and collaboration logic (roles, invitations, optimistic locking,
+recently deleted, living-person privacy, suggested edits, activity log) lives
+in `src/lib` and is covered by tests. Phase 7 added the screens for it.
 
 ## Local setup
 

@@ -162,10 +162,12 @@
     "thisIsYou": "Ini Anda",
     "notMe": "Bukan saya",
     "centerOnChart": "Tengahkan di bagan",
-    "download": "Unduh silsilah ini:",
-    "downloadGedcom": "GEDCOM (untuk aplikasi silsilah lain)",
-    "downloadJson": "JSON (semua rincian)",
-    "settingsLink": "Berbagi dan pengaturan"
+    "downloadGedcom": "Unduh GEDCOM",
+    "downloadJson": "Unduh JSON",
+    "settingsLink": "Berbagi dan pengaturan",
+    "moreLabel": "Pilihan silsilah",
+    "downloadGedcomHint": "Untuk aplikasi silsilah lain",
+    "downloadJsonHint": "Semua rincian, untuk cadangan"
   },
   "invite": {
     "title": "Anda diundang",
