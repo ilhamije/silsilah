@@ -74,18 +74,19 @@ export function PersonPanel({ treeId, person: p, people, relationships, canEdit,
   }
 
   return (
-    <section aria-labelledby="person-h" className="neo-card flex flex-col gap-8 p-5 sm:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <section aria-labelledby="person-h" className="neo-card overflow-hidden">
+      <header className="flex flex-wrap items-start justify-between gap-4 border-b-4 border-ink bg-self px-5 py-5 sm:px-8">
         <h2 id="person-h" className="break-words">
           {p.fullName}
         </h2>
         <Button type="button" variant="secondary" onClick={onClose}>
           {t("close")}
         </Button>
-      </div>
+      </header>
 
+      <div className="flex flex-col gap-8 p-5 sm:p-8">
       {/* Anyone may say who they are in the tree; it only colours their own chart. */}
-      <div className="-mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         {isSelf && <span className="rounded-full border-3 border-ink bg-self px-3 py-0.5 text-sm font-semibold">{t("thisIsYou")}</span>}
         <Button type="button" variant="quiet" disabled={busy} className="min-h-11 text-sm" onClick={() => void act(() => setSelfAction(treeId, isSelf ? null : p.id))}>
           {isSelf ? t("notMe") : t("thisIsMe")}
@@ -190,6 +191,7 @@ export function PersonPanel({ treeId, person: p, people, relationships, canEdit,
           </div>
         </>
       )}
+      </div>
     </section>
   );
 }
@@ -210,7 +212,7 @@ function AddRelative({
   act: Act;
 }) {
   const t = useTranslations("tree");
-  const [kind, setKind] = useState<"parent" | "child" | "spouse" | null>(null);
+  const [kind, setKind] = useState<"parent" | "child" | "spouse" | "sibling" | null>(null);
   const [name, setName] = useState("");
   // A new child is the couple's by default; "" means the other parent isn't known (a step-child of the spouse).
   const [otherParent, setOtherParent] = useState(spouses.length === 1 ? spouses[0].id : "");
@@ -219,7 +221,14 @@ function AddRelative({
     e.preventDefault();
     if (!kind) return;
     const ok = await act(
-      () => addRelativeAction(treeId, p.id, kind, { fullName: name }, kind === "child" ? otherParent || null : null),
+      () => addRelativeAction(
+          treeId,
+          p.id,
+          kind,
+          { fullName: name },
+          kind === "child" ? otherParent || null : null,
+          t("unknownParentName"),
+        ),
       (res) => res.id ?? null,
     );
     if (ok) {
@@ -232,7 +241,7 @@ function AddRelative({
     <section aria-labelledby="add-rel-h" className="flex flex-col gap-4">
       <h3 id="add-rel-h">{t("addRelative", { name: p.fullName })}</h3>
       <div className="flex flex-wrap gap-3">
-        {(["parent", "child", "spouse"] as const).map((k) => (
+        {(["parent", "child", "spouse", "sibling"] as const).map((k) => (
           <Button key={k} type="button" variant={kind === k ? "primary" : "secondary"} aria-pressed={kind === k} onClick={() => setKind(kind === k ? null : k)}>
             {t(`add_${k}`)}
           </Button>
@@ -240,7 +249,7 @@ function AddRelative({
       </div>
       {kind && (
         <form onSubmit={add} className="flex flex-col gap-4">
-          <Field id="relative-name" label={t(`name_${kind}`)} hint={t("relativeHint")}>
+          <Field id="relative-name" label={t(`name_${kind}`)} hint={kind === "sibling" ? t("siblingHint", { name: p.fullName, unknown: t("unknownParentName") }) : t("relativeHint")}>
             <Input id="relative-name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={200} autoFocus />
           </Field>
           {kind === "child" && spouses.length > 0 && (

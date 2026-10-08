@@ -49,6 +49,31 @@ describeDb("adding relatives from the chart", () => {
     expect(log).toBeGreaterThanOrEqual(7); // Sari + 3 × (person + relationship)
   });
 
+  it("adds a sibling under a placeholder parent when there are no parents yet", async () => {
+    const { owner, tree, sari } = await setup();
+    const sibling = await addRelative(db, owner.id, tree.id, sari.id, "sibling", { fullName: "Dewi" });
+
+    const { people, relationships } = await readTree(db, owner.id, tree.id);
+    const parentIds = (id: string) =>
+      relationships.filter((r) => r.type === "PARENT_CHILD" && r.personBId === id).map((r) => r.personAId);
+    const [shared] = parentIds(sari.id);
+    expect(parentIds(sari.id)).toHaveLength(1);
+    expect(parentIds(sibling.id)).toEqual([shared]);
+    expect(people.find((p) => p.id === shared)?.fullName).toBe("Unknown");
+  });
+
+  it("gives a sibling the same parents as the person", async () => {
+    const { owner, tree, sari } = await setup();
+    const father = await addRelative(db, owner.id, tree.id, sari.id, "parent", { fullName: "Hasan" });
+    const mother = await addRelative(db, owner.id, tree.id, sari.id, "parent", { fullName: "Aminah" });
+    const sibling = await addRelative(db, owner.id, tree.id, sari.id, "sibling", { fullName: "Dewi" });
+
+    const { people, relationships } = await readTree(db, owner.id, tree.id);
+    const parents = relationships.filter((r) => r.type === "PARENT_CHILD" && r.personBId === sibling.id).map((r) => r.personAId);
+    expect(parents.sort()).toEqual([father.id, mother.id].sort());
+    expect(people.some((p) => p.fullName === "Unknown")).toBe(false);
+  });
+
   it("refuses a third parent and creates nobody", async () => {
     const { owner, tree, sari } = await setup();
     await addRelative(db, owner.id, tree.id, sari.id, "parent", { fullName: "Hasan" });

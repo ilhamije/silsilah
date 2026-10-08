@@ -135,7 +135,7 @@ export function liveRelationshipsWhere(treeId: string) {
   } satisfies Prisma.RelationshipWhereInput;
 }
 
-export const RELATIVE_KINDS = ["parent", "child", "spouse"] as const;
+export const RELATIVE_KINDS = ["parent", "child", "spouse", "sibling"] as const;
 export type RelativeKind = (typeof RELATIVE_KINDS)[number];
 
 /**
@@ -146,6 +146,11 @@ export type RelativeKind = (typeof RELATIVE_KINDS)[number];
  * For a child, `otherParentId` (usually the person's spouse) makes it the
  * couple's child; without it the child has one parent in the tree, which is
  * how a step-child of that parent's spouse is recorded.
+ *
+ * A sibling is a new person with the same parents as `personId`. When the
+ * person has no parent in the tree yet, one placeholder parent (named
+ * `unknownParentName`, "Unknown" by default) is created for both of them, so
+ * the siblings stay connected until the real parent is filled in.
  */
 export async function addRelative(
   db: Db,
@@ -155,6 +160,7 @@ export async function addRelative(
   kind: unknown,
   input: unknown,
   otherParentId: string | null = null,
+  unknownParentName = "Unknown",
 ) {
   await assertTreePermission(db, userId, treeId, "person.write");
   await assertTreePermission(db, userId, treeId, "relationship.write");
@@ -183,19 +189,55 @@ export async function addRelative(
     const person = await tx.person.create({
       data: { treeId, ...personDataFromFields(parsed.data), updatedById: userId },
     });
-    const [type, personAId, personBId] =
-      parsedKind.data === "parent"
-        ? (["PARENT_CHILD", person.id, anchor.id] as const)
-        : parsedKind.data === "child"
-          ? (["PARENT_CHILD", anchor.id, person.id] as const)
-          : (["SPOUSE", ...[anchor.id, person.id].sort()] as ["SPOUSE", string, string]);
-    const rel = await tx.relationship.create({ data: { treeId, type, personAId, personBId } });
-    const secondRel = otherParent
-      ? await tx.relationship.create({
-          data: { treeId, type: "PARENT_CHILD", personAId: otherParent.id, personBId: person.id },
-        })
-      : null;
-
+    const links: { type: "PARENT_CHILD" | "SPOUSE"; personAId: string; personBId: string }[] = [];
+    if (parsedKind.data === "parent") {
+      links.push({ type: "PARENT_CHILD", personAId: person.id, personBId: anchor.id });
+    } else if (parsedKind.data === "child") {
+      links.push({ type: "PARENT_CHILD", personAId: anchor.id, personBId: person.id });
+      if (otherParent) links.push({ type: "PARENT_CHILD", personAId: otherParent.id, personBId: person.id });
+    } else if (parsedKind.data === "spouse") {
+      const [personAId, personBId] = [anchor.id, person.id].sort();
+      links.push({ type: "SPOUSE", personAId, personBId });
+    } else {
+      const parentEdges = await tx.relationship.findMany({
+        where: { treeId, type: "PARENT_CHILD", personBId: anchor.id, deletedAt: null, personA: { deletedAt: null } },
+        select: { personAId: true },
+      });
+      let parentIds = parentEdges.map((e) => e.personAId);
+      if (parentIds.length === 0) {
+        const placeholder = await tx.person.create({
+          data: {
+            treeId,
+            ...personDataFromFields(personFieldsSchema.parse({ fullName: unknownParentName })),
+            updatedById: userId,
+          },
+        });
+        await logActivity(tx, {
+          treeId,
+          userId,
+          action: "created",
+          entityType: "person",
+          entityId: placeholder.id,
+          after: { fullName: placeholder.fullName, gender: placeholder.gender },
+        });
+        links.push({ type: "PARENT_CHILD", personAId: placeholder.id, personBId: anchor.id });
+        parentIds = [placeholder.id];
+      }
+      for (const parentId of parentIds) {
+        links.push({ type: "PARENT_CHILD", personAId: parentId, personBId: person.id });
+      }
+    }
+    for (const link of links) {
+      const rel = await tx.relationship.create({ data: { treeId, ...link } });
+      await logActivity(tx, {
+        treeId,
+        userId,
+        action: "created",
+        entityType: "relationship",
+        entityId: rel.id,
+        after: link,
+      });
+    }
     await logActivity(tx, {
       treeId,
       userId,
@@ -204,24 +246,6 @@ export async function addRelative(
       entityId: person.id,
       after: { fullName: person.fullName, gender: person.gender },
     });
-    await logActivity(tx, {
-      treeId,
-      userId,
-      action: "created",
-      entityType: "relationship",
-      entityId: rel.id,
-      after: { type, personAId, personBId },
-    });
-    if (secondRel) {
-      await logActivity(tx, {
-        treeId,
-        userId,
-        action: "created",
-        entityType: "relationship",
-        entityId: secondRel.id,
-        after: { type: "PARENT_CHILD", personAId: secondRel.personAId, personBId: person.id },
-      });
-    }
     await touchTree(tx, treeId, userId);
     return person;
   });

@@ -95,10 +95,20 @@ export async function addRelativeAction(
   kind: string,
   fields: unknown,
   otherParentId: string | null = null,
+  unknownParentName?: string,
 ) {
   return run(
     (userId) =>
-      addRelative(db, userId, str(treeId), str(personId), kind, fields, otherParentId ? str(otherParentId) : null),
+      addRelative(
+        db,
+        userId,
+        str(treeId),
+        str(personId),
+        kind,
+        fields,
+        otherParentId ? str(otherParentId) : null,
+        unknownParentName ? str(unknownParentName) : undefined,
+      ),
     str(treeId),
   );
 }
