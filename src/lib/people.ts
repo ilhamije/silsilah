@@ -20,22 +20,31 @@ const optionalText = (max: number) =>
     .nullish()
     .transform((v) => (v ? v : null));
 
-export const personFieldsSchema = z.object({
+const personShape = {
   fullName: z.string().trim().min(1).max(200),
   givenName: optionalText(100),
   familyName: optionalText(100),
-  nicknames: z.array(z.string().trim().min(1).max(100)).max(20).default([]),
-  gender: z.enum(["MALE", "FEMALE", "UNKNOWN"]).default("UNKNOWN"),
+  nicknames: z.array(z.string().trim().min(1).max(100)).max(20),
+  gender: z.enum(["MALE", "FEMALE", "UNKNOWN"]),
   birthDate: optionalText(60),
   deathDate: optionalText(60),
   birthPlace: optionalText(200),
   notes: optionalText(4000),
   // null = infer from dates; true/false = manual override.
-  livingOverride: z.boolean().nullable().default(null),
+  livingOverride: z.boolean().nullable(),
+};
+
+export const personFieldsSchema = z.object({
+  ...personShape,
+  nicknames: personShape.nicknames.default([]),
+  gender: personShape.gender.default("UNKNOWN"),
+  livingOverride: personShape.livingOverride.default(null),
 });
 
 export type PersonFields = z.infer<typeof personFieldsSchema>;
-export const personPatchSchema = personFieldsSchema.partial();
+// No defaults here: a patch only carries the fields it names, so a partial
+// edit must not reset the others.
+export const personPatchSchema = z.object(personShape).partial();
 export type PersonPatch = z.infer<typeof personPatchSchema>;
 
 /** Fields a person edit may touch, used for diffs in conflicts and the activity log. */
