@@ -220,7 +220,8 @@
     }
   },
   "footer": {
-    "privacy": "Silsilah menjaga kerahasiaan silsilah keluarga. Hanya orang yang Anda undang yang bisa melihatnya. Foto hanya dibaca sekali dan tidak pernah disimpan: kami hanya menyimpan nama dan hubungan yang Anda konfirmasi, dan Anda dapat menghapus silsilah kapan saja."
+    "privacy": "Silsilah menjaga kerahasiaan silsilah keluarga. Hanya orang yang Anda undang yang bisa melihatnya. Foto hanya dibaca sekali dan tidak pernah disimpan: kami hanya menyimpan nama dan hubungan yang Anda konfirmasi, dan Anda dapat menghapus silsilah kapan saja.",
+    "about": "Tentang Silsilah"
   },
   "upload": {
     "eyebrow": "Tambah dari foto",
@@ -605,6 +606,98 @@
       "name_mismatch": "Nama yang Anda ketik tidak cocok.",
       "forbidden": "Anda tidak punya izin untuk itu.",
       "tree_not_found": "Silsilah ini sudah tidak ada."
+    }
+  },
+  "pages": {
+    "nav": {
+      "howTo": "Cara pakai",
+      "why": "Mengapa saya membuat ini",
+      "features": "Fitur",
+      "domain": "Mengapa tanpa domain sendiri"
+    },
+    "eyebrow": "Tentang Silsilah",
+    "howTo": {
+      "title": "Cara memakai Silsilah",
+      "lede": "Dari lembar tulisan tangan menjadi silsilah yang bisa dibuka seluruh keluarga, dalam beberapa langkah.",
+      "items": [
+        "Masuk dengan email. Anda menerima tautan, tanpa kata sandi. Akun dibuat saat pertama kali Anda mengeklik tautan itu.",
+        "Buat silsilah dari \"Silsilah saya\" dan beri nama, misalnya nama keluarga.",
+        "Tambahkan orang dengan memotret silsilah tulisan tangan (satu foto per halaman) atau menambah kerabat satu per satu.",
+        "Periksa hasil bacaan AI. Setiap nama, tanggal, dan hubungan ditampilkan di samping foto Anda, dan yang kurang pasti diberi tanda untuk Anda konfirmasi. Perbaiki yang salah, lalu simpan.",
+        "Buka bagan keluarga. Cubit dan geser untuk berpindah, ketuk seseorang untuk melihat detailnya.",
+        "Ketuk seseorang untuk menambah orang tua, anak, pasangan, atau saudara, mengubah detailnya, atau menghubungkannya dengan orang yang sudah ada di silsilah.",
+        "Undang kerabat dari pengaturan silsilah. Tentukan siapa yang hanya melihat dan siapa yang boleh mengubah. Pelihat dapat mengusulkan perubahan untuk Anda setujui.",
+        "Punya silsilah kedua dari keluarga yang sama? Silsilah menyarankan bagian yang tumpang tindih agar bisa Anda hubungkan.",
+        "Ekspor silsilah sebagai GEDCOM atau JSON kapan saja. Orang yang dihapus tetap ada di \"Baru dihapus\" sehingga bisa dipulihkan."
+      ]
+    },
+    "why": {
+      "title": "Mengapa saya membuat ini",
+      "lede": "Silsilah seharusnya bisa dibaca dan ditambah oleh seluruh keluarga, bukan selembar kertas di laci satu orang.",
+      "items": [
+        {
+          "h": "Keluarga yang bertambah tidak muat di kertas",
+          "p": "Ketika keluarga berkembang, silsilah menyebar ke banyak halaman panjang yang sulit diikuti dan sulit dijaga tetap utuh."
+        },
+        {
+          "h": "Sulit dicari",
+          "p": "Mencari satu sepupu berarti menyisir halaman demi halaman dengan mata. Tidak ada cara untuk langsung mencari nama."
+        },
+        {
+          "h": "Sulit dirawat",
+          "p": "Bayi baru atau pernikahan berarti menggambar ulang atau menyelipkan nama di pinggir. Koreksi meninggalkan coretan dan salinan jadi berbeda-beda."
+        },
+        {
+          "h": "Tidak semua orang bisa mengakses",
+          "p": "Biasanya hanya ada satu aslinya. Kerabat di luar negeri atau luar kota tidak pernah melihatnya, dan pemegangnya menjadi penghambat."
+        },
+        {
+          "h": "Kertas hanya memuat sedikit",
+          "p": "Silsilah kertas hanya berisi nama dan hubungan. Tidak ada tempat untuk tanggal lahir dan wafat, tempat, atau hal-hal kecil yang membuat seseorang terasa nyata."
+        }
+      ],
+      "closing": "Silsilah mengubah lembaran itu menjadi satu pohon yang hidup: bisa dicari, mudah dibagikan, mudah dikoreksi, dan mampu memuat detail yang tidak muat di kertas."
+    },
+    "features": {
+      "title": "Fitur",
+      "lede": "Yang sudah berfungsi sekarang dan yang ingin saya buat berikutnya.",
+      "nowTitle": "Sudah tersedia",
+      "now": [
+        "Membaca silsilah tulisan tangan dari foto, termasuk yang terdiri dari beberapa halaman",
+        "Layar tinjau yang menampilkan aslinya di samping hasil bacaan",
+        "Bagan keluarga interaktif dengan zoom dan geser lewat sentuhan",
+        "Menambah orang tua, anak, pasangan, dan saudara; menghubungkan orang yang sudah ada",
+        "Detail orang dengan tanggal, serta privasi untuk yang masih hidup",
+        "Mengundang kerabat sebagai pemilik, penyunting, atau pelihat",
+        "Usulan perubahan yang disetujui penyunting",
+        "Saran penggabungan ketika dua silsilah menggambarkan keluarga yang sama",
+        "Log aktivitas dan Baru dihapus dengan pemulihan",
+        "Ekspor GEDCOM dan JSON",
+        "Bahasa Indonesia dan Inggris, tema terang dan redup, nyaman di ponsel",
+        "Foto tidak pernah disimpan: hanya nama dan hubungan yang Anda konfirmasi"
+      ],
+      "nextTitle": "Direncanakan",
+      "next": [
+        "Mencari seseorang di seluruh silsilah",
+        "Impor GEDCOM dari aplikasi silsilah lain",
+        "Foto, cerita, dan dokumen yang dilampirkan pada seseorang",
+        "Poster silsilah yang bisa dicetak dan dibagikan",
+        "Pencari hubungan (\"kita bersaudara lewat siapa?\")",
+        "Pemberitahuan ketika kerabat menambah atau mengubah sesuatu",
+        "Lebih banyak bahasa dan domain sendiri"
+      ],
+      "note": "Daftar rencana ini adalah daftar harapan, bukan janji atau jadwal."
+    },
+    "domain": {
+      "title": "Mengapa tidak memakai domain sendiri?",
+      "lede": "Mungkin Anda memperhatikan tidak ada silsilah.com atau juriat.com. Alasannya sederhana: saya membiayai ini sendiri dan dana saya terbatas.",
+      "body": [
+        "Domain yang bagus harus dibayar setiap tahun, dan hosting, basis data, serta AI yang membaca foto juga berbiaya. Untuk sekarang saya menjalankan situs ini di paket gratis dan murah agar tetap bisa dipakai keluarga yang membutuhkan.",
+        "Jika Silsilah bermanfaat bagi Anda, Anda bisa mendukung saya langsung. Setiap dukungan masuk ke situs ini: domain yang layak lebih dulu, lalu pembacaan tulisan tangan yang lebih baik, lebih banyak fitur, dan hosting yang lebih andal."
+      ],
+      "cta": "Dukung proyek ini",
+      "noLink": "Tautan dukungan segera hadir.",
+      "thanks": "Terima kasih. Sekadar membagikan situs ini ke kerabat pun sangat membantu."
     }
   }
 }

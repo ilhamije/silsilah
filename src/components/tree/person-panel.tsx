@@ -305,7 +305,7 @@ function ConnectExisting({
   }
 
   return (
-    <section aria-labelledby="connect-h" className="flex flex-col gap-4">
+    <section aria-labelledby="connect-h" className="flex flex-col gap-4 border-t-3 border-ink pt-6">
       <h3 id="connect-h">{t("connectExisting")}</h3>
       <form onSubmit={connect} className="flex flex-col gap-4">
         <Field id="connect-relation" label={t("connectIs", { name: p.fullName })}>

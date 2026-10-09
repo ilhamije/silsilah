@@ -220,7 +220,8 @@
     }
   },
   "footer": {
-    "privacy": "Silsilah keeps family trees private. Only the people you invite can see yours. Photos are read once and never stored: we keep only the names and connections you confirm, and you can delete a tree at any time."
+    "privacy": "Silsilah keeps family trees private. Only the people you invite can see yours. Photos are read once and never stored: we keep only the names and connections you confirm, and you can delete a tree at any time.",
+    "about": "About Silsilah"
   },
   "upload": {
     "eyebrow": "Add from a photograph",
@@ -605,6 +606,98 @@
       "name_mismatch": "The name you typed doesn't match.",
       "forbidden": "You don't have permission to do that.",
       "tree_not_found": "This tree no longer exists."
+    }
+  },
+  "pages": {
+    "nav": {
+      "howTo": "How to use",
+      "why": "Why I built this",
+      "features": "Features",
+      "domain": "Why no own domain"
+    },
+    "eyebrow": "About Silsilah",
+    "howTo": {
+      "title": "How to use Silsilah",
+      "lede": "From a handwritten page to a tree your whole family can open, in a few steps.",
+      "items": [
+        "Sign in with your email. You get a link, there is no password. Your account is created the first time you click it.",
+        "Create a tree from \"My trees\" and give it a name, for example the name of the family.",
+        "Add people by photographing the handwritten tree (one photo per page) or by adding relatives one at a time.",
+        "Check what the AI read. Every name, date and connection is shown next to your photo, and anything uncertain is marked for you to confirm. Fix mistakes, then save.",
+        "Open the family chart. Pinch and drag to move around, tap a person to see their details.",
+        "Tap a person to add a parent, child, spouse or sibling, edit their details, or connect them to someone already in the tree.",
+        "Invite relatives from the tree settings. Choose who can only view and who can edit. Viewers can suggest edits for you to approve.",
+        "Got a second tree of the same family? Silsilah suggests where the two trees overlap so you can link them.",
+        "Export the tree as GEDCOM or JSON at any time. Deleted people stay in \"Recently deleted\" so they can be restored."
+      ]
+    },
+    "why": {
+      "title": "Why I built this",
+      "lede": "A family tree should be something the whole family can read and add to, not a sheet of paper in one person's drawer.",
+      "items": [
+        {
+          "h": "A growing family does not fit on paper",
+          "p": "Once a family expands, the tree spreads over many long pages that are hard to follow and hard to keep in one piece."
+        },
+        {
+          "h": "Hard to search",
+          "p": "Finding one cousin means scanning page after page by eye. There is no way to just look someone up."
+        },
+        {
+          "h": "Hard to maintain",
+          "p": "A new baby or a marriage means redrawing or squeezing a name into a margin. Corrections leave marks and copies drift apart."
+        },
+        {
+          "h": "Not everyone can get access",
+          "p": "There is usually one original. Relatives abroad or in other cities never see it, and the person who holds it becomes a bottleneck."
+        },
+        {
+          "h": "Paper holds very little",
+          "p": "A paper tree is just a name and a relationship. There is no room for birth and death dates, places or the small facts that make a person real."
+        }
+      ],
+      "closing": "Silsilah turns those pages into one living tree: searchable, shareable, easy to correct, and able to hold the details paper cannot."
+    },
+    "features": {
+      "title": "Features",
+      "lede": "What works today and what I would like to build next.",
+      "nowTitle": "Available now",
+      "now": [
+        "Read a handwritten family tree from photos, across several pages",
+        "Review screen that shows the original next to what was read",
+        "Interactive family chart with touch zoom and pan",
+        "Add parents, children, spouses and siblings; connect existing people",
+        "Person details with dates, and privacy for living people",
+        "Invite relatives as owner, editor or viewer",
+        "Suggested edits that editors approve",
+        "Merge suggestions when two trees describe the same family",
+        "Activity log and Recently deleted with restore",
+        "GEDCOM and JSON export",
+        "English and Bahasa Indonesia, light and dim themes, works well on phones",
+        "Photos are never stored: only the names and connections you confirm"
+      ],
+      "nextTitle": "Planned",
+      "next": [
+        "Search for a person across the whole tree",
+        "GEDCOM import from other genealogy tools",
+        "Photos, stories and documents attached to a person",
+        "Printable and shareable tree poster",
+        "Relationship finder (\"how are we related?\")",
+        "Notifications when relatives add or change something",
+        "More languages and a custom domain"
+      ],
+      "note": "The planned list is a wish list, not a promise or a schedule."
+    },
+    "domain": {
+      "title": "Why not a dedicated domain?",
+      "lede": "You may have noticed there is no silsilah.com or juriat.com. The reason is simple: I am funding this myself and my budget is limited.",
+      "body": [
+        "A good domain is paid for every year, and hosting, the database and the AI that reads the photos cost money too. For now I keep the site on free and low-cost plans so it can stay online for families who need it.",
+        "If Silsilah is useful to you, you can support me directly. Every contribution goes into the site itself: a proper domain first, then better reading of handwriting, more features and more reliable hosting."
+      ],
+      "cta": "Support the project",
+      "noLink": "A support link is coming soon.",
+      "thanks": "Thank you. Even just sharing the site with a relative helps."
     }
   }
 }
